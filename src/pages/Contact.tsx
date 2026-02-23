@@ -39,9 +39,9 @@ const Contact = () => {
               <h2 className="text-xl font-bold text-foreground mb-4">Contact Information</h2>
               <div className="space-y-4">
                 {[
-                  { icon: Phone, label: "Phone", value: "+91 99999 99999" },
+                  { icon: Phone, label: "Phone", value: "+91 89777 75878" },
                   { icon: Mail, label: "Email", value: "orders@mrpitani.com" },
-                  { icon: MapPin, label: "Address", value: "Cold Storage Complex, Industrial Area, City, State, India" },
+                  { icon: MapPin, label: "Address", value: "Kotagummam, Industrial Area, Rajahmundry, Andhra Pradesh, India" },
                   { icon: Clock, label: "Business Hours", value: "Mon – Sat: 7:00 AM – 9:00 PM | Sun: 8:00 AM – 2:00 PM" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-start gap-3">

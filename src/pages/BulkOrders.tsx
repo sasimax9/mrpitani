@@ -56,7 +56,7 @@ const BulkOrders = () => (
           <div className="mt-4 text-center">
             <p className="text-xs text-muted-foreground mb-2">Or reach us directly</p>
             <a
-              href="https://wa.me/919999999999?text=Hi%20Mr.Pitani,%20I%20need%20a%20bulk%20order%20quote"
+              href="https://wa.me/918977775878?text=Hi%20Mr.Pitani,%20I%20need%20a%20bulk%20order%20quote"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-lg bg-whatsapp px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105"
