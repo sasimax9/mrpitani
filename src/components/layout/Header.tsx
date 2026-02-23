@@ -31,10 +31,10 @@ const Header = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg hero-gradient">
-            <span className="text-lg font-extrabold text-primary-foreground">C</span>
+            <span className="text-lg font-extrabold text-primary-foreground">M</span>
           </div>
           <div className="leading-tight">
-            <span className="text-lg font-bold text-foreground">Sri Chandana Foods</span>
+            <span className="text-lg font-bold text-foreground">Mr.Pitani</span>
             <p className="text-[10px] text-muted-foreground leading-none">Fresh. Frozen. Fast Delivery.</p>
           </div>
         </Link>
