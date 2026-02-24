@@ -1,11 +1,43 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Truck, ShieldCheck, Snowflake, Clock, ChevronRight, Star, Award } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Truck, ShieldCheck, Snowflake, Clock, ChevronRight, Star, Award, ChevronLeft } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/ProductCard";
 import products from "@/data/products";
 import brands from "@/data/brands";
 import heroBg from "@/assets/hero-bg.jpg";
+
+const heroSlides = [
+  {
+    tag: "🔥 Limited Time Offer",
+    title: "Flat 15% Off on Bulk Orders 30kg+",
+    desc: "Stock up your kitchen with premium frozen foods. Free delivery on orders above ₹5,000.",
+    cta: { label: "Shop Now", path: "/products" },
+    cta2: { label: "Bulk Enquiry", path: "/bulk-orders" },
+  },
+  {
+    tag: "🧊 New Arrivals",
+    title: "Fresh Seafood Collection",
+    desc: "Prawns, Vanjaram, Pomfret & more – sourced daily and delivered frozen to your door.",
+    cta: { label: "View Seafood", path: "/products/non-veg" },
+    cta2: { label: "WhatsApp Order", path: "https://wa.me/918977775878" },
+  },
+  {
+    tag: "🥟 Snack Season",
+    title: "Party Snacks Starting ₹90",
+    desc: "Samosas, nuggets, rolls, momos – everything you need for the perfect party spread.",
+    cta: { label: "Explore Snacks", path: "/products/veg?cat=veg-snacks" },
+    cta2: { label: "View All", path: "/products" },
+  },
+  {
+    tag: "🏪 For Businesses",
+    title: "B2B Supply for Hotels & Restaurants",
+    desc: "Scheduled deliveries, cold chain logistics, and competitive bulk pricing for your business.",
+    cta: { label: "Partner With Us", path: "/bulk-orders" },
+    cta2: { label: "Our Brands", path: "/brands" },
+  },
+];
 
 const categories = [
   { label: "Veg", emoji: "🥬", path: "/products/veg", desc: "Veg chicken, mutton & more" },
@@ -36,41 +68,91 @@ const testimonials = [
 const fade = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 const stagger = { show: { transition: { staggerChildren: 0.1 } } };
 
-const Index = () => (
+const Index = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const slide = heroSlides[currentSlide];
+
+  return (
   <Layout>
-    {/* Hero */}
+    {/* Hero Carousel */}
     <section className="relative overflow-hidden">
       <div className="absolute inset-0">
         <img src={heroBg} alt="" className="h-full w-full object-cover" />
-        <div className="absolute inset-0 hero-gradient opacity-85" />
+        <div className="absolute inset-0 hero-gradient opacity-90" />
       </div>
       <div className="container relative py-20 md:py-32">
-        <motion.div initial="hidden" animate="show" variants={stagger} className="max-w-2xl">
-          <motion.p variants={fade} className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary-foreground/70">
-            Raw & Frozen Food Supplier
-          </motion.p>
-          <motion.h1 variants={fade} className="text-4xl font-extrabold leading-tight text-primary-foreground md:text-6xl">
-            Fresh. Frozen.{" "}
-            <span className="block">Fast Delivery.</span>
-          </motion.h1>
-          <motion.p variants={fade} className="mt-4 text-lg text-primary-foreground/80 max-w-lg">
-            Mr.Pitani Supplies premium raw & frozen food across India – for homes, restaurants, caterers, and businesses.
-          </motion.p>
-          <motion.div variants={fade} className="mt-8 flex flex-wrap gap-4">
-            <Link
-              to="/products"
-              className="inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-3 font-semibold text-accent-foreground transition-transform hover:scale-105"
-            >
-              Explore Products <ChevronRight className="h-4 w-4" />
-            </Link>
-            <Link
-              to="/bulk-orders"
-              className="inline-flex items-center gap-2 rounded-xl border-2 border-primary-foreground/30 px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
-            >
-              Bulk Enquiry
-            </Link>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ duration: 0.4 }}
+            className="max-w-2xl"
+          >
+            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary-foreground/70">
+              {slide.tag}
+            </p>
+            <h1 className="text-4xl font-extrabold leading-tight text-primary-foreground md:text-6xl">
+              {slide.title}
+            </h1>
+            <p className="mt-4 text-lg text-primary-foreground/80 max-w-lg">
+              {slide.desc}
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link
+                to={slide.cta.path}
+                className="inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-3 font-semibold text-accent-foreground transition-transform hover:scale-105"
+              >
+                {slide.cta.label} <ChevronRight className="h-4 w-4" />
+              </Link>
+              {slide.cta2.path.startsWith("http") ? (
+                <a
+                  href={slide.cta2.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl border-2 border-primary-foreground/30 px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
+                >
+                  {slide.cta2.label}
+                </a>
+              ) : (
+                <Link
+                  to={slide.cta2.path}
+                  className="inline-flex items-center gap-2 rounded-xl border-2 border-primary-foreground/30 px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
+                >
+                  {slide.cta2.label}
+                </Link>
+              )}
+            </div>
           </motion.div>
-        </motion.div>
+        </AnimatePresence>
+
+        {/* Slide indicators + nav */}
+        <div className="mt-10 flex items-center gap-4">
+          <button onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)} className="h-8 w-8 rounded-full bg-primary-foreground/10 flex items-center justify-center text-primary-foreground hover:bg-primary-foreground/20 transition-colors">
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div className="flex gap-2">
+            {heroSlides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentSlide(i)}
+                className={`h-2 rounded-full transition-all ${i === currentSlide ? "w-8 bg-accent" : "w-2 bg-primary-foreground/30"}`}
+              />
+            ))}
+          </div>
+          <button onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)} className="h-8 w-8 rounded-full bg-primary-foreground/10 flex items-center justify-center text-primary-foreground hover:bg-primary-foreground/20 transition-colors">
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     </section>
 
@@ -194,6 +276,7 @@ const Index = () => (
       </div>
     </section>
   </Layout>
-);
+  );
+};
 
 export default Index;

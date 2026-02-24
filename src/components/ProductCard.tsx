@@ -1,15 +1,76 @@
+import { useMemo, useState } from "react";
 import { type Product, categoryLabels, getCategoryColor } from "@/data/products";
-import { MessageCircle, FileText } from "lucide-react";
+import { ShoppingCart, Plus, Minus } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const whatsappMsg = encodeURIComponent(
-    `Hi Mr.Pitani, I'd like to enquire about: ${product.name} (Pack sizes: ${product.packSizes.join(", ")})`
-  );
+  // 🔥 Update these based on your CartContext functions
+  const {
+    addToCart,
+    // OPTIONAL common functions (use whichever exists in your context)
+    updateQuantity,
+    removeFromCart,
+    items,
+  }: any = useCart();
+
+  const [selectedPack, setSelectedPack] = useState(product.packSizes[0]);
+
+  // Find cart line for this product + selected pack
+  const cartLine = useMemo(() => {
+    return items.find(
+      (i: any) =>
+        i.product?.id === product.id &&
+        (i.packSize === selectedPack ||
+          i.pack === selectedPack ||
+          i.selectedPack === selectedPack)
+    );
+  }, [items, product.id, selectedPack]);
+
+  const qty = cartLine?.quantity ?? cartLine?.qty ?? (cartLine ? 1 : 0);
+
+  const increment = () => {
+    // If you store pack-based cart lines, addToCart should add for that pack
+    addToCart(product, selectedPack);
+  };
+
+  const decrement = () => {
+    const nextQty = qty - 1;
+
+    // Prefer updateQuantity if you have it
+    if (typeof updateQuantity === "function") {
+      if (nextQty <= 0) {
+        // remove line if qty becomes 0
+        if (typeof removeFromCart === "function") {
+          removeFromCart(product.id, selectedPack);
+        } else {
+          updateQuantity(product.id, selectedPack, 0);
+        }
+      } else {
+        updateQuantity(product.id, selectedPack, nextQty);
+      }
+      return;
+    }
+
+    // If you don't have updateQuantity, but have removeFromCart:
+    // - when qty is 1, remove line
+    // - otherwise you'll need a "decrease" function in your context
+    if (typeof removeFromCart === "function" && qty <= 1) {
+      removeFromCart(product.id, selectedPack);
+      return;
+    }
+
+    // Fallback: if your context has decreaseQuantity, map it here
+    console.warn(
+      "No updateQuantity/removeFromCart found. Add decrease logic in CartContext."
+    );
+  };
+
+  const inCart = qty > 0;
 
   return (
     <div className="group rounded-xl border border-border bg-card overflow-hidden card-shadow transition-all duration-300 hover:card-shadow-hover hover:-translate-y-1">
@@ -23,10 +84,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <p className="text-xs text-muted-foreground">Product Image</p>
           </div>
         </div>
-        {/* Category badge */}
-        <span className={`absolute top-3 left-3 px-2 py-0.5 rounded-full text-[10px] font-semibold ${getCategoryColor(product.category)}`}>
+
+        <span
+          className={`absolute top-3 left-3 px-2 py-0.5 rounded-full text-[10px] font-semibold ${getCategoryColor(
+            product.category
+          )}`}
+        >
           {categoryLabels[product.category]}
         </span>
+
         {product.bulkAvailable && (
           <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary text-primary-foreground">
             Bulk Available
@@ -35,29 +101,70 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </div>
 
       <div className="p-4">
-        <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{product.name}</h3>
+        <h3 className="font-semibold text-foreground mb-1 line-clamp-1">
+          {product.name}
+        </h3>
+        <p className="text-lg font-bold text-primary mb-2">₹{product.price}</p>
+
+        {/* Pack size selector */}
         <div className="flex flex-wrap gap-1 mb-3">
           {product.packSizes.map((s) => (
-            <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium">
+            <button
+              key={s}
+              onClick={() => setSelectedPack(s)}
+              className={`text-[10px] px-1.5 py-0.5 rounded font-medium transition-colors ${
+                selectedPack === s
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
               {s}
-            </span>
+            </button>
           ))}
         </div>
+
         <div className="flex gap-2">
-          <a
-            href={`https://wa.me/919999999999?text=${whatsappMsg}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-whatsapp py-2 text-xs font-semibold text-primary-foreground transition-transform hover:scale-[1.02]"
-          >
-            <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
-          </a>
-          <Link
-            to={`/contact?product=${encodeURIComponent(product.name)}`}
-            className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-primary py-2 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
-          >
-            <FileText className="h-3.5 w-3.5" /> Quote
-          </Link>
+          {/* Main button area */}
+          {!inCart ? (
+            <button
+              onClick={increment}
+              className="flex-1 flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all bg-primary text-primary-foreground hover:scale-[1.02]"
+            >
+              <ShoppingCart className="h-3.5 w-3.5" />
+              Add to Cart
+            </button>
+          ) : (
+            <div className="flex-1 flex items-center justify-between rounded-lg py-2 px-2 bg-primary text-primary-foreground text-xs font-semibold">
+              <button
+                type="button"
+                onClick={decrement}
+                className="h-7 w-7 rounded-md bg-primary-foreground/15 hover:bg-primary-foreground/25 flex items-center justify-center"
+                aria-label="Decrease quantity"
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+
+              <div className="min-w-10 text-center font-bold">{qty}</div>
+
+              <button
+                type="button"
+                onClick={increment}
+                className="h-7 w-7 rounded-md bg-primary-foreground/15 hover:bg-primary-foreground/25 flex items-center justify-center"
+                aria-label="Increase quantity"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
+          {inCart && (
+            <Link
+              to="/cart"
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-primary px-3 py-2 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+            >
+              Go to Cart
+            </Link>
+          )}
         </div>
       </div>
     </div>

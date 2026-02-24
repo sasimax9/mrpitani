@@ -58,7 +58,7 @@ const Contact = () => {
             </div>
 
             <a
-              href="https://wa.me/919999999999?text=Hi%20Mr.Pitani,%20I%20want%20to%20enquire%20about%20your%20products"
+              href="https://wa.me/918977775878?text=Hi%20Mr.Pitani,%20I%20want%20to%20enquire%20about%20your%20products"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-6 py-3 font-semibold text-primary-foreground transition-transform hover:scale-105"

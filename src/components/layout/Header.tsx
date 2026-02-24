@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { Menu, X, ChevronDown, Award } from "lucide-react";
+import { Menu, X, ChevronDown, Award, ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 const vegSubcategories = [
   { label: "All Veg Products", path: "/products/veg" },
@@ -19,6 +20,7 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const location = useLocation();
+  const { totalItems, totalPrice } = useCart();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -88,15 +90,28 @@ const Header = () => {
           <Link to="/contact" className={navLinkClass("/contact")}>Contact</Link>
         </nav>
 
-        {/* CTA */}
-        <a
-          href="https://wa.me/918977775878?text=Hi%20Mr.Pitani,%20I%20want%20to%20enquire%20about%20your%20products"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden lg:inline-flex items-center gap-2 rounded-lg bg-whatsapp px-4 py-2 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105"
-        >
-          WhatsApp Us
-        </a>
+        {/* Cart + CTA */}
+        <div className="hidden lg:flex items-center gap-3">
+          <Link to="/cart" className="relative flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+            <ShoppingCart className="h-4 w-4" />
+            {totalItems > 0 && (
+              <>
+                <span className="text-xs font-bold">₹{totalPrice.toFixed(0)}</span>
+                <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-accent text-[10px] font-bold text-accent-foreground flex items-center justify-center">
+                  {totalItems}
+                </span>
+              </>
+            )}
+          </Link>
+          <a
+            href="https://wa.me/918977775878?text=Hi%20Mr.Pitani,%20I%20want%20to%20enquire%20about%20your%20products"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg bg-whatsapp px-4 py-2 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105"
+          >
+            WhatsApp Us
+          </a>
+        </div>
 
         {/* Mobile toggle */}
         <button className="lg:hidden p-2" onClick={() => setMobileOpen(!mobileOpen)}>
