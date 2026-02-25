@@ -3,9 +3,31 @@ import { useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/ProductCard";
-import products, { categoryLabels, type ProductCategory } from "@/data/products";
+import { categoryLabels, type ProductCategory } from "@/data/products";
+import type { Product as UiProduct } from "@/data/products";
+import type { Product as ApiProduct } from "@/api/catalog";
+import { useCatalog } from "@/contexts/CatalogContext";
 
 const vegCategories: ProductCategory[] = ["veg", "general", "veg-snacks"];
+const toUiProduct = (p: ApiProduct): UiProduct => {
+  return {
+    id: p.id,
+    name: p.name,
+    category: p.category as ProductCategory,
+    type: p.type as "veg" | "non-veg",
+    storage: p.storage as "frozen" | "non-frozen",
+    prep: p.prep as "raw" | "ready-to-cook",
+    order: p.order as "bulk" | "retail" | "both",
+    packSizes: Array.isArray((p as any).packSizes)
+      ? (p as any).packSizes
+      : (p as any).pack_sizes ?? [],
+    bulkAvailable: (p as any).bulkAvailable ?? (p as any).bulk_available ?? false,
+    brand: (p as any).brand ?? undefined,
+    price: p.price ?? 0,
+    //image must exist for your UI type (set placeholder if missing)
+    image: (p as any).image ?? (p as any).image_url ?? "/placeholder.png",
+  };
+};
 
 const VegProducts = () => {
   const [searchParams] = useSearchParams();
@@ -16,6 +38,10 @@ const VegProducts = () => {
   );
   const [storageFilter, setStorageFilter] = useState<"all" | "frozen" | "non-frozen">("all");
   const [prepFilter, setPrepFilter] = useState<"all" | "raw" | "ready-to-cook">("all");
+  const { products: apiProducts, loading, error } = useCatalog();
+     const products: UiProduct[] = useMemo(() => {
+        return (apiProducts || []).map(toUiProduct);
+      }, [apiProducts]);
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -27,6 +53,7 @@ const VegProducts = () => {
       return true;
     });
   }, [search, catFilter, storageFilter, prepFilter]);
+
 
   const FilterBtn = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
     <button onClick={onClick} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${active ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>

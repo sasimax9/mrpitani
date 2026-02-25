@@ -46,9 +46,10 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     /* Custom tokens */
-    --hero-gradient: linear-gradient(135deg, hsl(192 80% 22%), hsl(160 45% 35%));
-    --card-shadow: 0 4px 24px -4px hsl(200 30% 20% / 0.08);
-    --card-shadow-hover: 0 8px 32px -4px hsl(200 30% 20% / 0.15);
+    --hero-gradient: linear-gradient(135deg, hsl(192 80% 18%), hsl(170 50% 28%), hsl(160 45% 35%));
+    --card-shadow: 0 2px 16px -2px hsl(200 30% 20% / 0.06), 0 1px 3px hsl(200 30% 20% / 0.04);
+    --card-shadow-hover: 0 12px 40px -8px hsl(200 30% 20% / 0.14), 0 4px 12px hsl(200 30% 20% / 0.06);
+    --glow-primary: 0 0 20px hsl(192 80% 22% / 0.15);
     --whatsapp: 142 70% 40%;
   }
 
@@ -108,5 +109,46 @@
 
   .card-shadow-hover {
     box-shadow: var(--card-shadow-hover);
+  }
+
+  .glass {
+    background: hsl(var(--card) / 0.6);
+    backdrop-filter: blur(16px) saturate(1.8);
+    -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  }
+
+  .glass-strong {
+    background: hsl(var(--card) / 0.85);
+    backdrop-filter: blur(24px) saturate(2);
+    -webkit-backdrop-filter: blur(24px) saturate(2);
+  }
+
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 25%, hsl(var(--primary-foreground) / 0.04) 50%, transparent 75%);
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+
+  .elegant-border {
+    border: 1px solid hsl(var(--border));
+    background-image: linear-gradient(hsl(var(--card)), hsl(var(--card))), 
+                       linear-gradient(135deg, hsl(var(--primary) / 0.15), transparent, hsl(var(--secondary) / 0.15));
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
   }
 }

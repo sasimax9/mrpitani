@@ -86,56 +86,79 @@ const Cart = () => {
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Items */}
           <div className="lg:col-span-2 space-y-3">
-            {items.map((item) => (
-              <div
-                key={`${item.product.id}-${item.selectedPack}`}
-                className="flex gap-4 items-center rounded-xl border border-border bg-card p-4 card-shadow"
-              >
-                <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                  <span className="text-2xl">{item.product.type === "veg" ? "🥬" : "🍗"}</span>
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-foreground text-sm truncate">{item.product.name}</h3>
-                  <p className="text-xs text-muted-foreground">
-                    {item.selectedPack} · ₹{item.product.price ?? 0}/unit
-                  </p>
-                </div>
-
-              <div className="flex items-center gap-2">
-  <button
-    disabled={item.quantity <= 1}
-    onClick={() => updateQuantity(item.product.id, item.selectedPack, item.quantity - 1)}
-    className="h-7 w-7 rounded-md border border-border flex items-center justify-center hover:bg-muted
-               disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+          {items.map((item) => (
+  <div
+    key={`${item.product.id}-${item.selectedPack}`}
+    className="rounded-xl border border-border bg-card p-4 card-shadow"
   >
-    <Minus className="h-3 w-3" />
-  </button>
+    {/* Top row: image + details */}
+    <div className="flex gap-3 items-start">
+      <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center shrink-0">
+        <span className="text-2xl">{item.product.type === "veg" ? "🥬" : "🍗"}</span>
+      </div>
 
-  <span className="text-sm font-semibold w-6 text-center">{item.quantity}</span>
+      <div className="flex-1 min-w-0">
+        <h3 className="font-semibold text-foreground text-sm truncate">{item.product.name}</h3>
+        <p className="text-xs text-muted-foreground">
+          {item.selectedPack} · ₹{item.product.price ?? 0}/unit
+        </p>
 
-  <button
-    disabled={item.quantity >= 500}
-    onClick={() => updateQuantity(item.product.id, item.selectedPack, item.quantity + 1)}
-    className="h-7 w-7 rounded-md border border-border flex items-center justify-center hover:bg-muted
-               disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-  >
-    <Plus className="h-3 w-3" />
-  </button>
-</div>
+        {/* Price for mobile */}
+        <p className="sm:hidden mt-2 text-sm font-bold text-foreground">
+          ₹{((item.product.price ?? 0) * item.quantity).toFixed(0)}
+        </p>
+      </div>
 
-                <p className="text-sm font-bold text-foreground w-16 text-right">
-                  ₹{((item.product.price ?? 0) * item.quantity).toFixed(0)}
-                </p>
+      {/* Delete button (top-right) */}
+      <button
+        onClick={() => removeFromCart(item.product.id, item.selectedPack)}
+        className="sm:hidden text-destructive hover:bg-destructive/10 p-2 rounded-md"
+        aria-label="Remove item"
+      >
+        <Trash2 className="h-4 w-4" />
+      </button>
+    </div>
 
-                <button
-                  onClick={() => removeFromCart(item.product.id, item.selectedPack)}
-                  className="text-destructive hover:bg-destructive/10 p-1.5 rounded-md"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
+    {/* Bottom row: qty controls + price + delete (desktop) */}
+    <div className="mt-3 flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2">
+        <button
+          disabled={item.quantity <= 1}
+          onClick={() => updateQuantity(item.product.id, item.selectedPack, item.quantity - 1)}
+          className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-muted
+                     disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        >
+          <Minus className="h-3.5 w-3.5" />
+        </button>
+
+        <span className="text-sm font-semibold w-8 text-center">{item.quantity}</span>
+
+        <button
+          disabled={item.quantity >= 500}
+          onClick={() => updateQuantity(item.product.id, item.selectedPack, item.quantity + 1)}
+          className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-muted
+                     disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        >
+          <Plus className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
+      {/* Desktop price + delete */}
+      <div className="hidden sm:flex items-center gap-3">
+        <p className="text-sm font-bold text-foreground w-20 text-right">
+          ₹{((item.product.price ?? 0) * item.quantity).toFixed(0)}
+        </p>
+        <button
+          onClick={() => removeFromCart(item.product.id, item.selectedPack)}
+          className="text-destructive hover:bg-destructive/10 p-2 rounded-md"
+          aria-label="Remove item"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  </div>
+))}
           </div>
 
           {/* Summary */}

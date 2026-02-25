@@ -1,11 +1,51 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { X } from "lucide-react";
 import Layout from "@/components/layout/Layout";
-import brands, { type Brand } from "@/data/brands";
+
+import localBrands, { type Brand as LocalBrand } from "@/data/brands";
+import { fetchBrands, type Brand as RemoteBrand } from "@/api/catalog";
+
+type Brand = LocalBrand & {
+  // ensure shape includes logo + products
+  logo: string;
+  products: string[];
+};
 
 const Brands = () => {
   const [selected, setSelected] = useState<Brand | null>(null);
+  const [brands, setBrands] = useState<Brand[]>(localBrands as Brand[]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        const remote: RemoteBrand[] = await fetchBrands();
+        if (!mounted) return;
+
+        // If remote brands exist use them, else fallback to local
+        setBrands((remote?.length ? remote : (localBrands as Brand[])) as Brand[]);
+      } catch (e) {
+        console.error("Failed to load brands from Supabase:", e);
+        // keep local
+        setBrands(localBrands as Brand[]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // If selected brand is from local and remote loads later, keep selected stable
+  const selectedBrand = useMemo(() => {
+    if (!selected) return null;
+    return brands.find((b) => b.id === selected.id) ?? selected;
+  }, [brands, selected]);
 
   return (
     <Layout>
@@ -21,6 +61,10 @@ const Brands = () => {
       </section>
 
       <section className="container py-10">
+        {loading && (
+          <p className="text-sm text-muted-foreground mb-4">Loading brands…</p>
+        )}
+
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {brands.map((brand) => (
             <button
@@ -30,12 +74,18 @@ const Brands = () => {
             >
               {/* Logo */}
               <div className="flex h-14 w-14 items-center justify-center bg-white border border-border overflow-hidden">
-                <img
-                  src={brand.logo}
-                  alt={`${brand.name} logo`}
-                  className="h-[1.8rem] w-auto object-contain"
-                  loading="lazy"
-                />
+                {brand.logo ? (
+                  <img
+                    src={brand.logo}
+                    alt={`${brand.name} logo`}
+                    className="h-[1.8rem] w-auto object-contain"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span className="text-[10px] text-muted-foreground">
+                    No Logo
+                  </span>
+                )}
               </div>
 
               <h3 className="font-semibold text-foreground text-sm">
@@ -50,7 +100,7 @@ const Brands = () => {
       </section>
 
       {/* Modal */}
-      {selected && (
+      {selectedBrand && (
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center bg-background/60 backdrop-blur-sm p-4"
           onClick={() => setSelected(null)}
@@ -70,16 +120,22 @@ const Brands = () => {
             <div className="text-center mb-6">
               {/* Modal Logo */}
               <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-full bg-white border border-border overflow-hidden mb-3">
-                <img
-                  src={selected.logo}
-                  alt={`${selected.name} logo`}
-                  className="h-[1.8rem] w-auto object-contain"
-                  loading="lazy"
-                />
+                {selectedBrand.logo ? (
+                  <img
+                    src={selectedBrand.logo}
+                    alt={`${selectedBrand.name} logo`}
+                    className="h-[1.8rem] w-auto object-contain"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span className="text-[10px] text-muted-foreground">
+                    No Logo
+                  </span>
+                )}
               </div>
 
               <h2 className="text-xl font-bold text-foreground">
-                {selected.name}
+                {selectedBrand.name}
               </h2>
               <p className="text-sm text-muted-foreground">
                 Authorized Distributor
@@ -90,7 +146,7 @@ const Brands = () => {
             <div className="flex justify-center mb-6">
               <div className="rounded-xl border border-border bg-white p-4">
                 <QRCodeSVG
-                  value={`${window.location.origin}/brands?brand=${selected.slug}`}
+                  value={`${window.location.origin}/brands?brand=${selectedBrand.slug}`}
                   size={160}
                   level="M"
                 />
@@ -105,17 +161,24 @@ const Brands = () => {
               <h3 className="text-sm font-semibold text-foreground mb-2">
                 Products Available
               </h3>
-              <ul className="space-y-1.5">
-                {selected.products.map((p, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center gap-2 text-sm text-muted-foreground"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                    {p}
-                  </li>
-                ))}
-              </ul>
+
+              {selectedBrand.products?.length ? (
+                <ul className="space-y-1.5">
+                  {selectedBrand.products.map((p, i) => (
+                    <li
+                      key={i}
+                      className="flex items-center gap-2 text-sm text-muted-foreground"
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Products list not available.
+                </p>
+              )}
             </div>
           </div>
         </div>
