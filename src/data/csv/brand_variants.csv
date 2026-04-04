@@ -1,0 +1,74 @@
+product_id,brand_name,price
+vs-1,McCain,180
+vs-1,ITC Master Chef,160
+vs-1,Hyfun Foods,140
+vs-1,Food Coast,130
+vs-2,McCain,160
+vs-2,Hyfun Foods,130
+vs-2,ITC Master Chef,150
+vs-3,Hyfun Foods,200
+vs-3,Snacker Street,180
+vs-3,Food Coast,170
+vs-4,Hyfun Foods,190
+vs-4,McCain,200
+vs-5,Hyfun Foods,190
+vs-5,Snacker Street,175
+vs-5,Food Coast,170
+vs-6,Hyfun Foods,200
+vs-6,Food Coast,180
+vs-7,Hyfun Foods,170
+vs-7,Snacker Street,160
+vs-8,Signature India,170
+vs-8,Yummis,150
+vs-8,WOW,160
+vs-9,Signature India,130
+vs-9,Yummis,110
+vs-9,Food Coast,120
+vs-11,WOW,160
+vs-11,Food Coast,130
+vs-16,McCain,240
+vs-16,Hyfun Foods,210
+vs-17,McCain,170
+vs-17,Hyfun Foods,150
+nvs-1,CP Foods,300
+nvs-1,Morton India,270
+nvs-1,ITC Master Chef,290
+nvs-1,Falcon Foods,260
+nvs-2,CP Foods,320
+nvs-2,Morton India,290
+nvs-2,Falcon Foods,280
+nvs-3,Falcon Foods,320
+nvs-3,CP Foods,340
+nvs-3,Morton India,310
+nvs-4,CP Foods,260
+nvs-4,Morton India,240
+nvs-4,Falcon Foods,230
+nvs-5,CP Foods,240
+nvs-5,Empire Foods,220
+nvs-5,Meatzz,210
+nvs-6,WOW,200
+nvs-6,CP Foods,190
+nvs-7,Meatzz,280
+nvs-7,Empire Foods,270
+nvs-8,Meatzz,210
+nvs-8,Empire Foods,200
+nvs-8,CP Foods,220
+nvs-9,CP Foods,220
+nvs-9,Empire Foods,200
+g-5,Milk Misty,320
+g-5,Heritage Milk Products,300
+g-7,Nutrilight Butter,260
+g-7,Heritage Milk Products,240
+g-13,Go Cheese,190
+g-13,Heritage Milk Products,170
+g-14,Go Cheese,360
+g-14,Heritage Milk Products,340
+g-15,Go Cheese,400
+g-15,Heritage Milk Products,370
+g-10,Tanvi Foods,95
+g-10,ITC Master Chef,110
+g-10,Food Coast,85
+g-11,Tanvi Foods,85
+g-11,Food Coast,75
+g-12,Tanvi Foods,75
+g-12,Food Coast,65

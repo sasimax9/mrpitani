@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 const Footer = () => (
-  <footer className="bg-primary text-primary-foreground">
+  <footer className="glass-footer text-primary-foreground">
     <div className="container py-12">
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
         {/* Brand */}
@@ -10,7 +10,7 @@ const Footer = () => (
           <h3 className="text-xl font-bold mb-2">Mr.Pitani</h3>
           <p className="text-sm text-primary-foreground/70 mb-4">Fresh. Frozen. Fast Delivery.</p>
           <p className="text-sm text-primary-foreground/70">
-            India's trusted raw & frozen food Supplier. Quality products for homes, restaurants, and businesses.
+            India's trusted raw & frozen food distributor. Quality products for homes, restaurants, and businesses.
           </p>
         </div>
 
@@ -45,7 +45,7 @@ const Footer = () => (
           <div className="flex flex-col gap-3 text-sm text-primary-foreground/70">
             <div className="flex items-start gap-2">
               <Phone className="h-4 w-4 mt-0.5 shrink-0" />
-              <span>+91 89777 75878</span>
+              <span>+91 99999 99999</span>
             </div>
             <div className="flex items-start gap-2">
               <Mail className="h-4 w-4 mt-0.5 shrink-0" />

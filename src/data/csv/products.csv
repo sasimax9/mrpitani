@@ -1,0 +1,70 @@
+id,name,category,type,storage,prep,order,pack_sizes,bulk_available,brand,price,image_path
+v-1,Veg Chicken,veg,veg,frozen,ready-to-cook,both,"1kg,500g",true,SAIVAI,180,products/veg-chicken.jpg
+v-2,Veg Mutton,veg,veg,frozen,ready-to-cook,both,"1kg,500g",true,SAIVAI,200,products/veg-mutton.jpg
+v-3,Veg Prawn,veg,veg,frozen,ready-to-cook,both,"1kg,500g",true,SAIVAI,220,products/veg-prawn.jpg
+v-4,Veg Fish,veg,veg,frozen,ready-to-cook,both,"1kg,500g",true,SAIVAI,190,products/veg-fish.jpg
+v-5,Veg Keema,veg,veg,frozen,ready-to-cook,both,"1kg,500g",true,SAIVAI,170,products/veg-keema.jpg
+v-6,Mixed Vegetables,veg,veg,frozen,raw,both,"1kg,500g",true,,150,products/mixed-veg.jpg
+v-7,Broccoli,veg,veg,frozen,raw,both,"1kg,500g",true,,180,products/broccoli.jpg
+v-8,Capsicum Red,veg,veg,frozen,raw,both,"1kg,500g",true,,160,products/capsicum.jpg
+v-9,Capsicum Yellow,veg,veg,frozen,raw,both,"1kg,500g",true,,160,products/capsicum.jpg
+v-10,Capsicum Green,veg,veg,frozen,raw,both,"1kg,500g",true,,140,products/capsicum.jpg
+nv-1,Prawns Small,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,350,products/prawns.jpg
+nv-2,Prawns Medium,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,450,products/prawns.jpg
+nv-3,Prawns Large,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,550,products/prawns.jpg
+nv-4,Apollo Fish Small,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,280,products/fish.jpg
+nv-5,Apollo Fish Medium,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,320,products/fish.jpg
+nv-6,Apollo Fish Large,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,380,products/fish.jpg
+nv-7,Barha Fish Indian,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,300,products/fish.jpg
+nv-8,Barha Fish Vietnam,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,260,products/fish.jpg
+nv-9,Nettalu,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,200,products/fish.jpg
+nv-10,Bommidaylu,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,220,products/fish.jpg
+nv-11,Vanjaram,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,600,products/fish.jpg
+nv-12,Pomfret Black,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,500,products/fish.jpg
+nv-13,Pomfret White,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,550,products/fish.jpg
+nv-14,Raw Chicken,non-veg,non-veg,frozen,raw,both,"1kg,500g,2kg",true,,180,products/raw-chicken.jpg
+nv-15,Raw Lollipops,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,250,products/raw-chicken.jpg
+nv-16,Raw Drumsticks,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,200,products/raw-chicken.jpg
+nv-17,Quail Birds,non-veg,non-veg,frozen,raw,both,"1kg,500g",true,,350,products/raw-chicken.jpg
+g-1,Sweet Corn,general,veg,frozen,raw,both,"1kg,500g",true,,120,products/sweet-corn.jpg
+g-2,Green Peas,general,veg,frozen,raw,both,"1kg,500g",true,,100,products/sweet-corn.jpg
+g-3,Mushrooms,general,veg,frozen,raw,both,"1kg,500g,200g",true,,150,products/mushrooms.jpg
+g-4,Baby Corn,general,veg,frozen,raw,both,"1kg,500g",true,,140,products/sweet-corn.jpg
+g-5,Paneer,general,veg,non-frozen,raw,both,"1kg,500g,200g",true,,320,products/paneer.jpg
+g-6,Khoya,general,veg,non-frozen,raw,both,"1kg,500g",true,,400,products/paneer.jpg
+g-7,Butter,general,veg,non-frozen,raw,both,"500g,200g,100g",true,,250,products/butter-ghee.jpg
+g-8,Ghee,general,veg,non-frozen,raw,both,"1kg,500g,200g",true,,550,products/butter-ghee.jpg
+g-9,Peeled Garlic,general,veg,non-frozen,raw,both,"1kg,500g",true,,180,products/sweet-corn.jpg
+g-10,Malabar Parota,general,veg,frozen,ready-to-cook,both,"5pcs,10pcs",true,,90,products/spring-rolls.jpg
+g-11,Poori,general,veg,frozen,ready-to-cook,both,"10pcs,20pcs",true,,80,products/spring-rolls.jpg
+g-12,Chapati,general,veg,frozen,ready-to-cook,both,"10pcs,20pcs",true,,70,products/spring-rolls.jpg
+g-13,Cheese Slices,general,veg,non-frozen,raw,both,"200g,400g",true,,180,products/cheese.jpg
+g-14,Cheese Block,general,veg,non-frozen,raw,both,"1kg,200g",true,,350,products/cheese.jpg
+g-15,Mozzarella,general,veg,non-frozen,raw,both,"1kg,200g",true,,380,products/cheese.jpg
+vs-1,French Fries,veg-snacks,veg,frozen,ready-to-cook,both,"1kg,2.5kg,500g",true,,150,products/french-fries.jpg
+vs-2,Aloo Tikki,veg-snacks,veg,frozen,ready-to-cook,both,"1kg,500g",true,,140,products/french-fries.jpg
+vs-3,Veg Nuggets,veg-snacks,veg,frozen,ready-to-cook,both,"1kg,500g",true,,200,products/onion-rings.jpg
+vs-4,Onion Rings,veg-snacks,veg,frozen,ready-to-cook,both,"1kg,500g",true,,180,products/onion-rings.jpg
+vs-5,Veg Burger Patty,veg-snacks,veg,frozen,ready-to-cook,both,"1kg,500g",true,,190,products/burger-patty.jpg
+vs-6,Hara Bhara Kebab,veg-snacks,veg,frozen,ready-to-cook,both,"1kg,500g",true,,200,products/onion-rings.jpg
+vs-7,Veg Cutlet,veg-snacks,veg,frozen,ready-to-cook,both,"1kg,500g",true,,170,products/onion-rings.jpg
+vs-8,Spring Roll,veg-snacks,veg,frozen,ready-to-cook,both,"10pcs,20pcs",true,,160,products/spring-rolls.jpg
+vs-9,Samosa,veg-snacks,veg,frozen,ready-to-cook,both,"10pcs,20pcs,50pcs",true,,120,products/samosa.jpg
+vs-10,Corn Roll,veg-snacks,veg,frozen,ready-to-cook,both,"10pcs,20pcs",true,,150,products/spring-rolls.jpg
+vs-11,Veg Momos,veg-snacks,veg,frozen,ready-to-cook,both,"10pcs,20pcs",true,,140,products/momos.jpg
+vs-12,Paneer Tikka,veg-snacks,veg,frozen,ready-to-cook,both,"500g,1kg",true,,250,products/paneer.jpg
+vs-13,Cheese Balls,veg-snacks,veg,frozen,ready-to-cook,both,"500g,1kg",true,,200,products/cheese.jpg
+vs-14,Potato Wedges,veg-snacks,veg,frozen,ready-to-cook,both,"1kg,500g",true,,140,products/french-fries.jpg
+vs-15,Veg Fingers,veg-snacks,veg,frozen,ready-to-cook,both,"500g,1kg",true,,180,products/onion-rings.jpg
+vs-16,Cheese Shots,veg-snacks,veg,frozen,ready-to-cook,both,"500g,1kg",true,,220,products/cheese.jpg
+vs-17,Smiles,veg-snacks,veg,frozen,ready-to-cook,both,"1kg,500g",true,,160,products/french-fries.jpg
+nvs-1,Chicken Nuggets,non-veg-snacks,non-veg,frozen,ready-to-cook,both,"1kg,500g",true,,280,products/chicken-nuggets.jpg
+nvs-2,Chicken Popcorn,non-veg-snacks,non-veg,frozen,ready-to-cook,both,"1kg,500g",true,,300,products/chicken-popcorn.jpg
+nvs-3,Chicken Wings,non-veg-snacks,non-veg,frozen,ready-to-cook,both,"1kg,500g",true,,320,products/chicken-wings.jpg
+nvs-4,Chicken Burger Patty,non-veg-snacks,non-veg,frozen,ready-to-cook,both,"1kg,500g",true,,250,products/burger-patty.jpg
+nvs-5,Chicken Sausage,non-veg-snacks,non-veg,frozen,ready-to-cook,both,"500g,1kg",true,,220,products/sausage.jpg
+nvs-6,Chicken Momos,non-veg-snacks,non-veg,frozen,ready-to-cook,both,"10pcs,20pcs",true,,180,products/momos.jpg
+nvs-7,Chicken Seekh Kebab,non-veg-snacks,non-veg,frozen,ready-to-cook,both,"500g,1kg",true,,280,products/sausage.jpg
+nvs-8,Chicken Salami,non-veg-snacks,non-veg,frozen,ready-to-cook,both,"500g,1kg",true,,200,products/sausage.jpg
+nvs-9,Chicken Franks,non-veg-snacks,non-veg,frozen,ready-to-cook,both,"500g,1kg",true,,210,products/sausage.jpg
+nvs-10,Chicken Spring Roll,non-veg-snacks,non-veg,frozen,ready-to-cook,both,"10pcs,20pcs",true,,200,products/spring-rolls.jpg

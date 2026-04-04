@@ -1,0 +1,38 @@
+product_id,title,prep_time,cook_time,servings,difficulty,tip
+v-1,Crispy Veg Chicken Stir Fry,10 min,15 min,3-4,Easy,For extra crispiness shallow fry the veg chicken before adding to the stir fry.
+v-2,Veg Mutton Curry,15 min,25 min,4,Medium,Marinate veg mutton in yogurt and spices for 30 min for deeper flavor.
+v-3,Veg Prawn Manchurian,15 min,20 min,3-4,Medium,Serve as dry or gravy – add ½ cup water and cornflour slurry for gravy version.
+v-4,Veg Fish Fry,10 min,10 min,2-3,Easy,
+v-5,Spicy Veg Keema Masala,10 min,20 min,4,Easy,
+v-6,Mixed Vegetable Pulao,10 min,20 min,4,Easy,
+v-7,Garlic Butter Broccoli,5 min,8 min,2,Easy,
+v-8,Stuffed Red Capsicum,15 min,20 min,2,Medium,
+v-9,Yellow Capsicum Pasta,10 min,15 min,3,Easy,
+v-10,Green Capsicum Bhaji,5 min,10 min,2,Easy,
+nv-1,Butter Garlic Prawns,10 min,10 min,2-3,Easy,
+nv-2,Medium Prawn Curry,15 min,20 min,3-4,Medium,
+nv-3,Tandoori Jumbo Prawns,30 min,15 min,2-3,Medium,
+nv-4,Apollo Fish Fry,10 min,15 min,2-3,Easy,Double frying makes it extra crunchy!
+nv-5,Apollo Fish 65,15 min,15 min,3-4,Medium,
+nv-6,Grilled Apollo Fish Steak,15 min,20 min,2,Medium,
+nv-7,Indian Barha Fish Curry,15 min,25 min,4,Medium,
+nv-8,Vietnamese Barha Fish Stir Fry,10 min,12 min,3,Easy,
+nv-9,Nettalu (Sardine) Fry,10 min,10 min,2-3,Easy,
+nv-10,Bommidaylu Deep Fry,10 min,10 min,2-3,Easy,
+nv-11,Vanjaram Fish Fry (Seer Fish),15 min,12 min,3-4,Easy,Vanjaram is best when fried simply – don't over-season!
+nv-12,Black Pomfret Masala,15 min,20 min,2-3,Medium,
+nv-13,White Pomfret Tawa Fry,10 min,15 min,2,Easy,
+nv-14,Classic Whole Chicken Roast,20 min,60 min,4-6,Medium,
+nv-15,Spicy Chicken Lollipop,20 min,15 min,3-4,Medium,
+nv-16,Tandoori Drumsticks,30 min,25 min,3-4,Medium,
+nv-17,Quail Pepper Fry,15 min,20 min,2-3,Medium,
+g-1,Sweet Corn Soup,5 min,15 min,4,Easy,
+g-2,Matar Paneer,10 min,20 min,4,Easy,
+g-3,Mushroom Pepper Fry,5 min,10 min,2,Easy,
+g-4,Baby Corn Manchurian,10 min,15 min,3,Easy,
+g-5,Paneer Butter Masala,10 min,20 min,4,Easy,Soak paneer in warm water for 10 min to make it soft.
+vs-1,Crispy French Fries,5 min,10 min,2-3,Easy,Double frying at different temperatures gives the best crunch.
+vs-9,Crispy Samosa,10 min,15 min,4-5,Easy,
+vs-11,Steamed Veg Momos,5 min,12 min,3-4,Easy,
+nvs-1,Crispy Chicken Nuggets,5 min,8 min,2-3,Easy,
+nvs-6,Chicken Momos Gravy,10 min,15 min,3-4,Medium,

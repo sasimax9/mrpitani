@@ -1,15 +1,16 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { Product } from "@/data/products";
+import { Product, getProductPrice } from "@/data/products";
 
 export interface CartItem {
   product: Product;
   quantity: number;
   selectedPack: string;
+  selectedBrand?: string;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, packSize: string) => void;
+  addToCart: (product: Product, packSize: string, brand?: string) => void;
   removeFromCart: (productId: string, packSize: string) => void;
   updateQuantity: (productId: string, packSize: string, qty: number) => void;
   clearCart: () => void;
@@ -38,15 +39,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem(CART_KEY, JSON.stringify(items));
   }, [items]);
 
-  const addToCart = (product: Product, packSize: string) => {
+  const addToCart = (product: Product, packSize: string, brand?: string) => {
     setItems((prev) => {
-      const idx = prev.findIndex((i) => i.product.id === product.id && i.selectedPack === packSize);
+      const idx = prev.findIndex((i) => i.product.id === product.id && i.selectedPack === packSize && i.selectedBrand === brand);
       if (idx >= 0) {
         const next = [...prev];
         next[idx] = { ...next[idx], quantity: next[idx].quantity + 1 };
         return next;
       }
-      return [...prev, { product, quantity: 1, selectedPack: packSize }];
+      return [...prev, { product, quantity: 1, selectedPack: packSize, selectedBrand: brand }];
     });
   };
 
@@ -66,7 +67,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const clearCart = () => setItems([]);
 
   const totalItems = items.reduce((s, i) => s + i.quantity, 0);
-  const totalPrice = items.reduce((s, i) => s + (i.product.price ?? 0) * i.quantity, 0);
+  const totalPrice = items.reduce((s, i) => {
+    const price = getProductPrice(i.product, i.selectedBrand);
+    return s + price * i.quantity;
+  }, 0);
 
   const getDiscount = (totalKg: number) => {
     if (totalKg >= 30) return 15;

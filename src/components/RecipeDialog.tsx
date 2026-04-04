@@ -44,7 +44,7 @@ const RecipeDialog = ({ product, open, onOpenChange }: RecipeDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0 rounded-2xl border-border/50 shadow-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0 rounded-2xl shadow-2xl glass-card">
         {/* Hero header */}
         <div className="relative hero-gradient p-7 pb-9 overflow-hidden">
           {/* Decorative blurs */}
@@ -126,7 +126,7 @@ const RecipeDialog = ({ product, open, onOpenChange }: RecipeDialogProps) => {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + i * 0.05 }}
-                  className="flex gap-3.5 rounded-2xl border border-border bg-card p-4 text-sm hover:border-primary/15 transition-colors"
+                  className="flex gap-3.5 rounded-2xl p-4 text-sm glass-card glass-card-hover transition-colors"
                 >
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full hero-gradient text-[11px] font-bold text-primary-foreground shadow-sm">
                     {i + 1}
@@ -158,7 +158,7 @@ const RecipeDialog = ({ product, open, onOpenChange }: RecipeDialogProps) => {
           {/* Add to cart from dialog */}
           <motion.div
             initial="hidden" animate="show" custom={3} variants={fadeUp}
-            className="rounded-2xl border border-border bg-muted/20 p-5"
+            className="rounded-2xl p-5 glass-card"
           >
             <div className="flex items-center justify-between mb-4">
               <div>

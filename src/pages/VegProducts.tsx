@@ -1,33 +1,12 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/ProductCard";
 import { categoryLabels, type ProductCategory } from "@/data/products";
-import type { Product as UiProduct } from "@/data/products";
-import type { Product as ApiProduct } from "@/api/catalog";
-import { useCatalog } from "@/contexts/CatalogContext";
+import { useProducts } from "@/hooks/useProducts";
 
-const vegCategories: ProductCategory[] = ["veg", "general", "veg-snacks"];
-const toUiProduct = (p: ApiProduct): UiProduct => {
-  return {
-    id: p.id,
-    name: p.name,
-    category: p.category as ProductCategory,
-    type: p.type as "veg" | "non-veg",
-    storage: p.storage as "frozen" | "non-frozen",
-    prep: p.prep as "raw" | "ready-to-cook",
-    order: p.order as "bulk" | "retail" | "both",
-    packSizes: Array.isArray((p as any).packSizes)
-      ? (p as any).packSizes
-      : (p as any).pack_sizes ?? [],
-    bulkAvailable: (p as any).bulkAvailable ?? (p as any).bulk_available ?? false,
-    brand: (p as any).brand ?? undefined,
-    price: p.price ?? 0,
-    //image must exist for your UI type (set placeholder if missing)
-    image: (p as any).image ?? (p as any).image_url ?? "/placeholder.png",
-  };
-};
+const vegCategories: ProductCategory[] = ["veg", "general", "veg-snacks", "dairy", "crushes", "mocktail", "jam", "tin-items", "toppings", "sauces", "mayo", "seasoning"];
 
 const VegProducts = () => {
   const [searchParams] = useSearchParams();
@@ -38,10 +17,8 @@ const VegProducts = () => {
   );
   const [storageFilter, setStorageFilter] = useState<"all" | "frozen" | "non-frozen">("all");
   const [prepFilter, setPrepFilter] = useState<"all" | "raw" | "ready-to-cook">("all");
-  const { products: apiProducts, loading, error } = useCatalog();
-     const products: UiProduct[] = useMemo(() => {
-        return (apiProducts || []).map(toUiProduct);
-      }, [apiProducts]);
+
+  const { data: products = [], isLoading } = useProducts();
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -52,8 +29,7 @@ const VegProducts = () => {
       if (prepFilter !== "all" && p.prep !== prepFilter) return false;
       return true;
     });
-  }, [search, catFilter, storageFilter, prepFilter]);
-
+  }, [products, search, catFilter, storageFilter, prepFilter]);
 
   const FilterBtn = ({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) => (
     <button onClick={onClick} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${active ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
@@ -88,12 +64,20 @@ const VegProducts = () => {
           <FilterBtn active={prepFilter === "raw"} onClick={() => setPrepFilter("raw")}>Raw</FilterBtn>
           <FilterBtn active={prepFilter === "ready-to-cook"} onClick={() => setPrepFilter("ready-to-cook")}>Ready-to-Cook</FilterBtn>
         </div>
-        <p className="text-sm text-muted-foreground mb-4">{filtered.length} products</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
-        </div>
-        {filtered.length === 0 && (
-          <div className="text-center py-16"><p className="text-lg font-semibold text-muted-foreground">No products found</p></div>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <>
+            <p className="text-sm text-muted-foreground mb-4">{filtered.length} products</p>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
+            </div>
+            {filtered.length === 0 && (
+              <div className="text-center py-16"><p className="text-lg font-semibold text-muted-foreground">No products found</p></div>
+            )}
+          </>
         )}
       </section>
     </Layout>
