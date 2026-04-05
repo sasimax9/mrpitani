@@ -35,6 +35,155 @@ export type Database = {
         }
         Relationships: []
       }
+      bulk_orders: {
+        Row: {
+          company_name: string | null
+          contact_email: string | null
+          contact_name: string
+          contact_phone: string
+          created_at: string
+          discount_percent: number
+          id: string
+          items: Json
+          notes: string | null
+          status: string
+          subtotal: number
+          total: number
+          total_weight_kg: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          company_name?: string | null
+          contact_email?: string | null
+          contact_name: string
+          contact_phone: string
+          created_at?: string
+          discount_percent?: number
+          id?: string
+          items?: Json
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          total?: number
+          total_weight_kg?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          company_name?: string | null
+          contact_email?: string | null
+          contact_name?: string
+          contact_phone?: string
+          created_at?: string
+          discount_percent?: number
+          id?: string
+          items?: Json
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          total?: number
+          total_weight_kg?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          brand_name: string | null
+          id: string
+          order_id: string
+          pack_size: string | null
+          product_id: string
+          product_name: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          brand_name?: string | null
+          id?: string
+          order_id: string
+          pack_size?: string | null
+          product_id: string
+          product_name: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Update: {
+          brand_name?: string | null
+          id?: string
+          order_id?: string
+          pack_size?: string | null
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          delivery_address: string | null
+          delivery_name: string | null
+          delivery_phone: string | null
+          discount_percent: number
+          id: string
+          notes: string | null
+          payment_method: string
+          payment_status: string
+          status: string
+          subtotal: number
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivery_address?: string | null
+          delivery_name?: string | null
+          delivery_phone?: string | null
+          discount_percent?: number
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          payment_status?: string
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivery_address?: string | null
+          delivery_name?: string | null
+          delivery_phone?: string | null
+          discount_percent?: number
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          payment_status?: string
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       product_brand_variants: {
         Row: {
           brand_id: string

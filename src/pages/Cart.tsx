@@ -1,18 +1,26 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Minus, Plus, Trash2, ShoppingCart, MessageCircle, FileText, Store, Mail, CreditCard, Download, Send, X, CheckCircle2, Truck, Shield, Clock } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart, MessageCircle, FileText, Store, Mail, CreditCard, Download, Send, X, CheckCircle2, Truck, Shield, Clock, MapPin, Phone, User, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Layout from "@/components/layout/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useCart } from "@/contexts/CartContext";
 import { getProductPrice } from "@/data/products";
 import { getProductImageUrl, getCategoryImageUrl } from "@/lib/imageUrl";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Cart = () => {
   const { items, updateQuantity, removeFromCart, clearCart, totalPrice, getDiscount } = useCart();
+  const { user } = useAuth();
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
+  const [codDialogOpen, setCodDialogOpen] = useState(false);
+  const [codForm, setCodForm] = useState({ name: "", phone: "", address: "" });
+  const [codLoading, setCodLoading] = useState(false);
+  const [codSuccess, setCodSuccess] = useState(false);
 
   const estimateKg = (): number => {
     let totalGrams = 0;
@@ -255,36 +263,193 @@ const Cart = () => {
               </div>
             </ScrollReveal>
 
-            {/* Payment Options Skeleton */}
+            {/* Payment Options */}
             <ScrollReveal direction="up" delay={0.2}>
               <div className="rounded-2xl glass-card p-5">
                 <h3 className="font-bold text-foreground mb-3 flex items-center gap-2 text-sm">
                   <CreditCard className="h-4 w-4 text-primary" /> Payment Options
-                  <span className="ml-auto text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Coming Soon</span>
                 </h3>
-                <div className="space-y-3 opacity-50">
-                  {[
-                    { icon: CreditCard, label: "Credit / Debit Card", desc: "Visa, Mastercard, RuPay" },
-                    { icon: Shield, label: "UPI Payment", desc: "GPay, PhonePe, Paytm" },
-                    { icon: Truck, label: "Cash on Delivery", desc: "Pay when delivered" },
-                    { icon: Clock, label: "Net Banking", desc: "All major banks" },
-                  ].map((opt) => (
-                    <div key={opt.label} className="flex items-center gap-3 rounded-xl bg-muted/30 p-3">
-                      <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                        <opt.icon className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-foreground">{opt.label}</p>
-                        <p className="text-[10px] text-muted-foreground">{opt.desc}</p>
-                      </div>
+                <div className="space-y-3">
+                  {/* COD - Active */}
+                  <button
+                    onClick={() => {
+                      if (!user) {
+                        toast.error("Please sign in to place a COD order");
+                        return;
+                      }
+                      setCodDialogOpen(true);
+                    }}
+                    className="w-full flex items-center gap-3 rounded-xl bg-secondary/10 border border-secondary/20 p-3 hover:bg-secondary/20 transition-colors text-left"
+                  >
+                    <div className="h-9 w-9 rounded-lg bg-secondary/20 flex items-center justify-center shrink-0">
+                      <Truck className="h-4 w-4 text-secondary" />
                     </div>
-                  ))}
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-foreground">Cash on Delivery</p>
+                      <p className="text-[10px] text-muted-foreground">Pay when delivered</p>
+                    </div>
+                    <span className="text-[9px] font-bold text-secondary bg-secondary/15 px-2 py-0.5 rounded-full">Available</span>
+                  </button>
+
+                  {/* Other methods - Coming soon */}
+                  <div className="opacity-50 space-y-2">
+                    {[
+                      { icon: CreditCard, label: "Credit / Debit Card", desc: "Visa, Mastercard, RuPay" },
+                      { icon: Shield, label: "UPI Payment", desc: "GPay, PhonePe, Paytm" },
+                      { icon: Clock, label: "Net Banking", desc: "All major banks" },
+                    ].map((opt) => (
+                      <div key={opt.label} className="flex items-center gap-3 rounded-xl bg-muted/30 p-3">
+                        <div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                          <opt.icon className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs font-bold text-foreground">{opt.label}</p>
+                          <p className="text-[10px] text-muted-foreground">{opt.desc}</p>
+                        </div>
+                        <span className="text-[9px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Soon</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
           </div>
         </div>
       </div>
+
+      {/* COD Order Dialog */}
+      <AnimatePresence>
+        {codDialogOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          >
+            <div className="absolute inset-0 bg-foreground/40" onClick={() => !codLoading && setCodDialogOpen(false)} />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative w-full max-w-md rounded-2xl glass-card p-6 shadow-2xl"
+              style={{ backdropFilter: "blur(24px) saturate(2)" }}
+            >
+              <button onClick={() => !codLoading && setCodDialogOpen(false)} className="absolute top-4 right-4 p-1 rounded-lg hover:bg-muted">
+                <X className="h-4 w-4" />
+              </button>
+              {codSuccess ? (
+                <div className="text-center py-6">
+                  <CheckCircle2 className="mx-auto h-12 w-12 text-secondary mb-3" />
+                  <p className="font-bold text-foreground text-lg">Order Placed!</p>
+                  <p className="text-sm text-muted-foreground mt-1">Your COD order has been confirmed. We'll contact you shortly.</p>
+                </div>
+              ) : (
+                <>
+                  <h3 className="font-bold text-foreground mb-1 flex items-center gap-2">
+                    <Truck className="h-4 w-4 text-secondary" /> Cash on Delivery
+                  </h3>
+                  <p className="text-xs text-muted-foreground mb-4">Fill in delivery details to place your order</p>
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <input
+                        value={codForm.name}
+                        onChange={(e) => setCodForm({ ...codForm, name: e.target.value })}
+                        placeholder="Full Name"
+                        className="w-full rounded-xl glass-input pl-10 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      />
+                    </div>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <input
+                        value={codForm.phone}
+                        onChange={(e) => setCodForm({ ...codForm, phone: e.target.value })}
+                        placeholder="Phone Number"
+                        className="w-full rounded-xl glass-input pl-10 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      />
+                    </div>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <textarea
+                        value={codForm.address}
+                        onChange={(e) => setCodForm({ ...codForm, address: e.target.value })}
+                        placeholder="Delivery Address"
+                        rows={3}
+                        className="w-full rounded-xl glass-input pl-10 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                      />
+                    </div>
+                    <div className="rounded-xl bg-muted/40 p-3">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-muted-foreground">Total</span>
+                        <span className="font-bold text-primary">₹{finalPrice.toFixed(0)}</span>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">{items.length} items · {totalKg.toFixed(1)} kg{discountPct > 0 ? ` · ${discountPct}% bulk discount` : ""}</p>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        if (!codForm.name || !codForm.phone || !codForm.address) {
+                          toast.error("Please fill all delivery details");
+                          return;
+                        }
+                        setCodLoading(true);
+                        try {
+                          const { data: order, error: orderErr } = await supabase.from("orders").insert({
+                            user_id: user!.id,
+                            payment_method: "cod",
+                            payment_status: "pending",
+                            delivery_name: codForm.name,
+                            delivery_phone: codForm.phone,
+                            delivery_address: codForm.address,
+                            subtotal: totalPrice,
+                            discount_percent: discountPct,
+                            total: finalPrice,
+                          }).select("id").single();
+
+                          if (orderErr) throw orderErr;
+
+                          const orderItems = items.map((i) => {
+                            const price = getProductPrice(i.product, i.selectedBrand);
+                            return {
+                              order_id: order.id,
+                              product_id: i.product.id,
+                              product_name: i.product.name,
+                              brand_name: i.selectedBrand || null,
+                              pack_size: i.selectedPack,
+                              quantity: i.quantity,
+                              unit_price: price,
+                              total_price: price * i.quantity,
+                            };
+                          });
+
+                          const { error: itemsErr } = await supabase.from("order_items").insert(orderItems);
+                          if (itemsErr) throw itemsErr;
+
+                          setCodSuccess(true);
+                          clearCart();
+                          setTimeout(() => {
+                            setCodSuccess(false);
+                            setCodDialogOpen(false);
+                            setCodForm({ name: "", phone: "", address: "" });
+                          }, 3000);
+                        } catch (err: any) {
+                          toast.error(err.message || "Failed to place order");
+                        } finally {
+                          setCodLoading(false);
+                        }
+                      }}
+                      disabled={codLoading}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-secondary py-3 font-bold text-secondary-foreground disabled:opacity-50 hover:shadow-lg transition-all"
+                    >
+                      {codLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
+                      {codLoading ? "Placing Order..." : `Place COD Order · ₹${finalPrice.toFixed(0)}`}
+                    </button>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Email Dialog */}
       <AnimatePresence>

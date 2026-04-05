@@ -1,10 +1,11 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { type Product, categoryLabels } from "@/data/products";
+import { type Product, categoryLabels, getProductPrice } from "@/data/products";
 import recipes from "@/data/recipes";
-import { Clock, Users, ChefHat, Lightbulb, Flame, ShoppingCart, Check, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
+import { Clock, Users, ChefHat, Lightbulb, Flame, ShoppingCart, Check, Sparkles, Store, ChevronLeft, ChevronRight, Leaf, Drumstick } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
+import QuantityStepper from "./QuantityStepper";
 
 interface RecipeDialogProps {
   product: Product;
@@ -28,14 +29,33 @@ const fadeUp = {
 
 const RecipeDialog = ({ product, open, onOpenChange }: RecipeDialogProps) => {
   const recipe = recipes[product.id];
-  const { addToCart } = useCart();
-  const [added, setAdded] = useState(false);
+  const { addToCart, updateQuantity, items } = useCart();
+
+  const brands = product.brandVariants && product.brandVariants.length > 0
+    ? product.brandVariants
+    : [{ brand: product.brand || "Standard", price: product.price }];
+
+  const [brandIndex, setBrandIndex] = useState(0);
   const [selectedPack, setSelectedPack] = useState(product.packSizes[0]);
 
-  const handleAdd = () => {
-    addToCart(product, selectedPack);
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+  const currentBrand = brands[brandIndex];
+  const hasBrands = brands.length > 1;
+
+  const cartItem = items.find(
+    (i) => i.product.id === product.id && i.selectedPack === selectedPack && i.selectedBrand === currentBrand.brand
+  );
+  const cartQty = cartItem?.quantity ?? 0;
+
+  const handleAdd = () => addToCart(product, selectedPack, currentBrand.brand);
+  const handleIncrement = () => addToCart(product, selectedPack, currentBrand.brand);
+  const handleDecrement = () => updateQuantity(product.id, selectedPack, cartQty - 1);
+
+  const goToBrand = (dir: "left" | "right") => {
+    setBrandIndex((prev) =>
+      dir === "right"
+        ? (prev + 1) % brands.length
+        : (prev - 1 + brands.length) % brands.length
+    );
   };
 
   if (!recipe) return null;
@@ -47,13 +67,16 @@ const RecipeDialog = ({ product, open, onOpenChange }: RecipeDialogProps) => {
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0 rounded-2xl shadow-2xl glass-card">
         {/* Hero header */}
         <div className="relative hero-gradient p-7 pb-9 overflow-hidden">
-          {/* Decorative blurs */}
           <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-primary-foreground/[0.04] blur-2xl" />
           <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full bg-accent/[0.08] blur-2xl" />
 
           <DialogHeader className="relative z-10">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-3xl drop-shadow-sm">{product.type === "veg" ? "🥬" : "🍗"}</span>
+              {product.type === "veg" ? (
+                <Leaf className="h-5 w-5 text-primary-foreground/80" />
+              ) : (
+                <Drumstick className="h-5 w-5 text-primary-foreground/80" />
+              )}
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-primary-foreground/15 text-primary-foreground backdrop-blur-sm border border-primary-foreground/10">
                 {categoryLabels[product.category]}
               </span>
@@ -66,11 +89,10 @@ const RecipeDialog = ({ product, open, onOpenChange }: RecipeDialogProps) => {
               {recipe.title}
             </DialogTitle>
             <DialogDescription className="text-primary-foreground/65 text-sm mt-2">
-              Made with <span className="font-semibold text-primary-foreground/80">{product.name}</span> • ₹{product.price} per pack
+              Made with <span className="font-semibold text-primary-foreground/80">{product.name}</span>
             </DialogDescription>
           </DialogHeader>
 
-          {/* Meta badges */}
           <div className="flex flex-wrap gap-2.5 mt-6">
             {[
               { icon: Clock, label: `Prep: ${recipe.prepTime}` },
@@ -155,42 +177,96 @@ const RecipeDialog = ({ product, open, onOpenChange }: RecipeDialogProps) => {
             </motion.div>
           )}
 
-          {/* Add to cart from dialog */}
+          {/* Add to cart — matching ProductCard behavior */}
           <motion.div
             initial="hidden" animate="show" custom={3} variants={fadeUp}
             className="rounded-2xl p-5 glass-card"
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="font-bold text-foreground">{product.name}</p>
-                <p className="text-xl font-extrabold text-primary mt-0.5">₹{product.price}</p>
+                {hasBrands && (
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <Store className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs font-semibold text-muted-foreground">{currentBrand.brand}</span>
+                  </div>
+                )}
               </div>
-              <div className="flex flex-wrap gap-1.5">
-                {product.packSizes.map((s) => (
+
+              {/* Brand navigation */}
+              {hasBrands && (
+                <div className="flex items-center gap-2">
                   <button
-                    key={s}
-                    onClick={() => setSelectedPack(s)}
-                    className={`text-[11px] px-2.5 py-1 rounded-lg font-medium transition-all duration-200 ${
-                      selectedPack === s
-                        ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
-                        : "bg-muted text-muted-foreground hover:bg-muted/80"
-                    }`}
+                    onClick={() => goToBrand("left")}
+                    className="h-7 w-7 rounded-full glass-card flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors"
                   >
-                    {s}
+                    <ChevronLeft className="h-3.5 w-3.5" />
                   </button>
+                  <span className="text-[10px] font-bold text-muted-foreground">{brandIndex + 1}/{brands.length}</span>
+                  <button
+                    onClick={() => goToBrand("right")}
+                    className="h-7 w-7 rounded-full glass-card flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors"
+                  >
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Brand dots */}
+            {hasBrands && (
+              <div className="flex gap-1 mb-3">
+                {brands.map((b, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setBrandIndex(i)}
+                    className={`rounded-full transition-all duration-300 ${
+                      i === brandIndex
+                        ? "w-4 h-1.5 bg-primary"
+                        : "w-1.5 h-1.5 bg-foreground/20 hover:bg-foreground/40"
+                    }`}
+                  />
                 ))}
               </div>
+            )}
+
+            {/* Price */}
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={currentBrand.price}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                className="text-xl font-extrabold text-primary mb-3"
+              >
+                ₹{currentBrand.price}
+              </motion.p>
+            </AnimatePresence>
+
+            {/* Pack size selector */}
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {product.packSizes.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSelectedPack(s)}
+                  className={`text-[11px] px-2.5 py-1 rounded-lg font-medium transition-all duration-200 ${
+                    selectedPack === s
+                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
             </div>
-            <button
-              onClick={handleAdd}
-              className={`w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all duration-200 ${
-                added
-                  ? "bg-secondary text-secondary-foreground"
-                  : "bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/20 active:scale-[0.99]"
-              }`}
-            >
-              {added ? <><Check className="h-4 w-4" /> Added to Cart!</> : <><ShoppingCart className="h-4 w-4" /> Add to Cart – ₹{product.price}</>}
-            </button>
+
+            {/* Quantity stepper — same as ProductCard */}
+            <QuantityStepper
+              quantity={cartQty}
+              onAdd={handleAdd}
+              onIncrement={handleIncrement}
+              onDecrement={handleDecrement}
+            />
           </motion.div>
         </div>
       </DialogContent>
