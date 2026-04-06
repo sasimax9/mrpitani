@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Menu, X, ChevronDown, Award, ShoppingCart, Package, User, LogOut } from "lucide-react";
+import { Menu, X, ChevronDown, Award, ShoppingCart, Package, User, LogOut, Settings, ShoppingBag } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -40,12 +40,10 @@ const Header = () => {
   const navLinkClass = (path: string) =>
     `text-sm font-medium transition-colors hover:text-primary ${isActive(path) ? "text-primary" : "text-foreground/80"}`;
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileOpen) {
       document.body.style.overflow = "hidden";
@@ -55,23 +53,25 @@ const Header = () => {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
+  const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || user?.phone || "User";
+
   return (
     <>
       <header className="sticky top-0 z-50 glass-nav">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 flex h-14 sm:h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg hero-gradient">
-              <span className="text-lg font-extrabold text-primary-foreground">M</span>
+          <Link to="/" className="flex items-center gap-2 shrink-0">
+            <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg hero-gradient">
+              <span className="text-base sm:text-lg font-extrabold text-primary-foreground">M</span>
             </div>
             <div className="leading-tight">
-              <span className="text-lg font-bold text-foreground">Mr.Pitani</span>
-              <p className="text-[10px] text-muted-foreground leading-none">Fresh. Frozen. Fast Delivery.</p>
+              <span className="text-base sm:text-lg font-bold text-foreground">Mr.Pitani</span>
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground leading-none hidden sm:block">Fresh. Frozen. Fast Delivery.</p>
             </div>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-6">
             <Link to="/" className={navLinkClass("/")}>Home</Link>
             <Link to="/about" className={navLinkClass("/about")}>About</Link>
 
@@ -119,36 +119,45 @@ const Header = () => {
             <Link to="/contact" className={navLinkClass("/contact")}>Contact</Link>
           </nav>
 
-          {/* Cart + CTA */}
-          <div className="hidden lg:flex items-center gap-3">
-            {/* Auth button */}
+          {/* Cart + Auth */}
+          <div className="hidden lg:flex items-center gap-2 xl:gap-3">
             {user ? (
               <div className="relative group">
-                <button className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                <button className="flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors">
                   <div className="h-6 w-6 rounded-full hero-gradient flex items-center justify-center">
                     <User className="h-3 w-3 text-primary-foreground" />
                   </div>
-                  <span className="text-xs max-w-[100px] truncate">{user.email || user.phone}</span>
+                  <span className="text-xs max-w-[100px] truncate">{displayName}</span>
+                  <ChevronDown className="h-3 w-3 text-muted-foreground" />
                 </button>
                 <div className="absolute top-full right-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                  <button
-                    onClick={() => signOut()}
-                    className="flex items-center gap-2 glass-dropdown rounded-xl px-4 py-2.5 text-sm text-foreground hover:text-destructive transition-colors whitespace-nowrap"
-                  >
-                    <LogOut className="h-3.5 w-3.5" /> Sign Out
-                  </button>
+                  <div className="glass-dropdown rounded-2xl p-2 min-w-[180px] space-y-0.5">
+                    <div className="px-3 py-2 border-b border-border/50 mb-1">
+                      <p className="text-xs font-bold text-foreground truncate">{displayName}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{user.email || user.phone}</p>
+                    </div>
+                    <Link to="/cart" className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-foreground hover:bg-muted transition-colors">
+                      <ShoppingBag className="h-3.5 w-3.5 text-muted-foreground" /> My Orders
+                    </Link>
+                    <button
+                      onClick={() => signOut()}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-foreground hover:text-destructive hover:bg-destructive/5 transition-colors w-full text-left"
+                    >
+                      <LogOut className="h-3.5 w-3.5" /> Sign Out
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
               <button
                 onClick={() => setAuthOpen(true)}
-                className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                className="flex items-center gap-2 rounded-xl border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
               >
                 <User className="h-4 w-4" /> Login
               </button>
             )}
 
-            <Link to="/cart" className="relative flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+            <Link to="/cart" className="relative flex items-center gap-1.5 rounded-xl border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors">
               <ShoppingCart className="h-4 w-4" />
               {totalItems > 0 && (
                 <>
@@ -163,16 +172,16 @@ const Header = () => {
               href="https://wa.me/919999999999?text=Hi%20Mr.Pitani,%20I%20want%20to%20enquire%20about%20your%20products"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--whatsapp))] px-4 py-2 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105"
+              className="inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--whatsapp))] px-4 py-2 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105"
             >
               WhatsApp Us
             </a>
           </div>
 
           {/* Mobile: Auth + Cart + Toggle */}
-          <div className="flex lg:hidden items-center gap-1">
+          <div className="flex lg:hidden items-center gap-0.5">
             {user ? (
-              <button onClick={() => signOut()} className="p-2 text-foreground">
+              <button onClick={() => setMobileOpen(true)} className="p-2 text-foreground">
                 <div className="h-7 w-7 rounded-full hero-gradient flex items-center justify-center">
                   <User className="h-3.5 w-3.5 text-primary-foreground" />
                 </div>
@@ -197,7 +206,7 @@ const Header = () => {
         </div>
       </header>
 
-      {/* ─── Mobile Full-Screen Overlay ─── */}
+      {/* Mobile Full-Screen Overlay */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -206,7 +215,6 @@ const Header = () => {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[60] lg:hidden"
           >
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -215,30 +223,42 @@ const Header = () => {
               onClick={() => setMobileOpen(false)}
             />
 
-            {/* Drawer panel */}
             <motion.nav
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="absolute top-0 right-0 h-full w-[85%] max-w-sm glass-strong border-l border-border/30 shadow-2xl flex flex-col"
+              className="absolute top-0 right-0 h-full w-[80%] max-w-xs glass-strong border-l border-border/30 shadow-2xl flex flex-col"
             >
-              {/* Drawer header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-                <span className="text-lg font-bold text-foreground">Menu</span>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <span className="text-base font-bold text-foreground">Menu</span>
                 <button onClick={() => setMobileOpen(false)} className="p-1 rounded-lg hover:bg-muted transition-colors" aria-label="Close menu">
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
-              {/* Links */}
-              <div className="flex-1 overflow-y-auto px-5 py-4">
-                <div className="flex flex-col gap-1">
+              {/* User info in mobile drawer */}
+              {user && (
+                <div className="px-4 py-3 border-b border-border/50">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-full hero-gradient flex items-center justify-center shrink-0">
+                      <User className="h-4 w-4 text-primary-foreground" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-foreground truncate">{displayName}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{user.email || user.phone}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex-1 overflow-y-auto px-4 py-3">
+                <div className="flex flex-col gap-0.5">
                   {mobileLinks.map(link => (
                     <Link
                       key={link.path}
                       to={link.path}
-                      className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
+                      className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                         isActive(link.path)
                           ? "bg-primary/10 text-primary font-semibold"
                           : "text-foreground hover:bg-muted"
@@ -248,9 +268,8 @@ const Header = () => {
                     </Link>
                   ))}
 
-                  {/* Expandable product sub-links */}
                   <button
-                    className="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                    className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
                     onClick={() => setProductsOpen(!productsOpen)}
                   >
                     Browse Categories
@@ -262,28 +281,36 @@ const Header = () => {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden pl-4 border-l-2 border-primary/20 ml-4"
+                        className="overflow-hidden pl-3 border-l-2 border-primary/20 ml-3"
                       >
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-2 mb-1 px-3">Veg</p>
                         {vegSubcategories.map(s => (
-                          <Link key={s.path} to={s.path} className="block px-3 py-2 text-sm text-foreground/80 hover:text-primary transition-colors">
+                          <Link key={s.path} to={s.path} className="block px-3 py-1.5 text-sm text-foreground/80 hover:text-primary transition-colors">
                             {s.label}
                           </Link>
                         ))}
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-3 mb-1 px-3">Non-Veg</p>
                         {nonVegSubcategories.map(s => (
-                          <Link key={s.path} to={s.path} className="block px-3 py-2 text-sm text-foreground/80 hover:text-primary transition-colors">
+                          <Link key={s.path} to={s.path} className="block px-3 py-1.5 text-sm text-foreground/80 hover:text-primary transition-colors">
                             {s.label}
                           </Link>
                         ))}
                       </motion.div>
                     )}
                   </AnimatePresence>
+
+                  {user && (
+                    <button
+                      onClick={() => { signOut(); setMobileOpen(false); }}
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/5 transition-colors mt-2"
+                    >
+                      <LogOut className="h-4 w-4" /> Sign Out
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* CTA at bottom */}
-              <div className="px-5 py-4 border-t border-border">
+              <div className="px-4 py-3 border-t border-border">
                 <Link
                   to="/bulk-orders"
                   className="flex items-center justify-center gap-2 w-full rounded-xl hero-gradient py-3 text-sm font-bold text-primary-foreground shadow-lg transition-all hover:scale-[1.02]"
