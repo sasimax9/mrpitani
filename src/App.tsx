@@ -19,6 +19,7 @@ import FAQ from "./pages/FAQ";
 import Privacy from "./pages/Privacy";
 import Brands from "./pages/Brands";
 import Cart from "./pages/Cart";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/brands" element={<Brands />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

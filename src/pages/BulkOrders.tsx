@@ -187,7 +187,21 @@ const BulkOrders = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) setShowSuccess(true);
+    if (validate()) {
+      setShowSuccess(true);
+    }
+  };
+
+  const handleCloseSuccess = () => {
+    setShowSuccess(false);
+    setOrderItems([]);
+    setForm({
+      business: "", contact: "", phone: "", email: "",
+      city: "", address: "", product: "", category: "all",
+      quantity: 1, unit: "", date: "", notes: "", brand: "",
+    });
+    setSearch("");
+    setErrors({});
   };
 
   const orderSummaryText = orderItems.map((item, i) =>
@@ -621,12 +635,12 @@ const BulkOrders = () => {
       <AnimatePresence>
         {showSuccess && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={() => setShowSuccess(false)}>
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={handleCloseSuccess}>
             <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }} onClick={e => e.stopPropagation()}
               className="relative w-full max-w-md rounded-2xl p-8 shadow-2xl glass-card">
-              <button onClick={() => setShowSuccess(false)} className="absolute top-4 right-4 rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+              <button onClick={handleCloseSuccess} className="absolute top-4 right-4 rounded-lg p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
                 <X className="h-5 w-5" />
               </button>
               <div className="text-center mb-6">
@@ -661,7 +675,7 @@ const BulkOrders = () => {
                   className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-sm font-bold text-foreground transition-all hover:bg-muted hover:scale-[1.02]">
                   <Mail className="h-4 w-4" /> Send to Email
                 </a>
-                <button onClick={() => setShowSuccess(false)} className="w-full rounded-xl py-3 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
+                <button onClick={handleCloseSuccess} className="w-full rounded-xl py-3 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
                   Close
                 </button>
               </div>

@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown, Award, ShoppingCart, Package, User, LogOut, Settings, ShoppingBag } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthDialog from "@/components/AuthDialog";
@@ -40,9 +39,7 @@ const Header = () => {
   const navLinkClass = (path: string) =>
     `text-sm font-medium transition-colors hover:text-primary ${isActive(path) ? "text-primary" : "text-foreground/80"}`;
 
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [location.pathname]);
+  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -75,7 +72,6 @@ const Header = () => {
             <Link to="/" className={navLinkClass("/")}>Home</Link>
             <Link to="/about" className={navLinkClass("/about")}>About</Link>
 
-            {/* Products dropdown */}
             <div className="relative group">
               <button className={`${navLinkClass("/products")} flex items-center gap-1`}>
                 Products <ChevronDown className="h-3 w-3" />
@@ -87,9 +83,7 @@ const Header = () => {
                       <span className="h-2 w-2 rounded-full bg-secondary inline-block" /> Veg
                     </p>
                     {vegSubcategories.map((s) => (
-                      <Link key={s.path} to={s.path} className="block py-1.5 text-sm text-foreground/80 hover:text-primary transition-colors">
-                        {s.label}
-                      </Link>
+                      <Link key={s.path} to={s.path} className="block py-1.5 text-sm text-foreground/80 hover:text-primary transition-colors">{s.label}</Link>
                     ))}
                   </div>
                   <div>
@@ -97,15 +91,11 @@ const Header = () => {
                       <span className="h-2 w-2 rounded-full bg-accent inline-block" /> Non-Veg
                     </p>
                     {nonVegSubcategories.map((s) => (
-                      <Link key={s.path} to={s.path} className="block py-1.5 text-sm text-foreground/80 hover:text-primary transition-colors">
-                        {s.label}
-                      </Link>
+                      <Link key={s.path} to={s.path} className="block py-1.5 text-sm text-foreground/80 hover:text-primary transition-colors">{s.label}</Link>
                     ))}
                   </div>
                   <div className="col-span-2 border-t border-border pt-3">
-                    <Link to="/products" className="text-sm font-semibold text-primary hover:underline">
-                      View All Products →
-                    </Link>
+                    <Link to="/products" className="text-sm font-semibold text-primary hover:underline">View All Products →</Link>
                   </div>
                 </div>
               </div>
@@ -136,6 +126,9 @@ const Header = () => {
                       <p className="text-xs font-bold text-foreground truncate">{displayName}</p>
                       <p className="text-[10px] text-muted-foreground truncate">{user.email || user.phone}</p>
                     </div>
+                    <Link to="/profile" className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-foreground hover:bg-muted transition-colors">
+                      <Settings className="h-3.5 w-3.5 text-muted-foreground" /> My Profile
+                    </Link>
                     <Link to="/cart" className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-foreground hover:bg-muted transition-colors">
                       <ShoppingBag className="h-3.5 w-3.5 text-muted-foreground" /> My Orders
                     </Link>
@@ -172,7 +165,7 @@ const Header = () => {
               href="https://wa.me/919999999999?text=Hi%20Mr.Pitani,%20I%20want%20to%20enquire%20about%20your%20products"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--whatsapp))] px-4 py-2 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105"
+              className="inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--whatsapp))] px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               WhatsApp Us
             </a>
@@ -206,122 +199,94 @@ const Header = () => {
         </div>
       </header>
 
-      {/* Mobile Full-Screen Overlay */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] lg:hidden"
-          >
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-foreground/50 backdrop-blur-sm"
-              onClick={() => setMobileOpen(false)}
-            />
+      {/* Mobile Full-Screen Overlay - NO framer-motion */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-[60] lg:hidden">
+          <div className="absolute inset-0 bg-foreground/50 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
 
-            <motion.nav
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="absolute top-0 right-0 h-full w-[80%] max-w-xs glass-strong border-l border-border/30 shadow-2xl flex flex-col"
-            >
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                <span className="text-base font-bold text-foreground">Menu</span>
-                <button onClick={() => setMobileOpen(false)} className="p-1 rounded-lg hover:bg-muted transition-colors" aria-label="Close menu">
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
+          <nav className="absolute top-0 right-0 h-full w-[80%] max-w-xs glass-strong border-l border-border/30 shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <span className="text-base font-bold text-foreground">Menu</span>
+              <button onClick={() => setMobileOpen(false)} className="p-1 rounded-lg hover:bg-muted transition-colors" aria-label="Close menu">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-              {/* User info in mobile drawer */}
-              {user && (
-                <div className="px-4 py-3 border-b border-border/50">
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full hero-gradient flex items-center justify-center shrink-0">
-                      <User className="h-4 w-4 text-primary-foreground" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-foreground truncate">{displayName}</p>
-                      <p className="text-[10px] text-muted-foreground truncate">{user.email || user.phone}</p>
-                    </div>
+            {user && (
+              <div className="px-4 py-3 border-b border-border/50">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-full hero-gradient flex items-center justify-center shrink-0">
+                    <User className="h-4 w-4 text-primary-foreground" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-foreground truncate">{displayName}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{user.email || user.phone}</p>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              <div className="flex-1 overflow-y-auto px-4 py-3">
-                <div className="flex flex-col gap-0.5">
-                  {mobileLinks.map(link => (
-                    <Link
-                      key={link.path}
-                      to={link.path}
-                      className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                        isActive(link.path)
-                          ? "bg-primary/10 text-primary font-semibold"
-                          : "text-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-
-                  <button
-                    className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                    onClick={() => setProductsOpen(!productsOpen)}
+            <div className="flex-1 overflow-y-auto px-4 py-3">
+              <div className="flex flex-col gap-0.5">
+                {mobileLinks.map(link => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                      isActive(link.path) ? "bg-primary/10 text-primary font-semibold" : "text-foreground hover:bg-muted"
+                    }`}
                   >
-                    Browse Categories
-                    <ChevronDown className={`h-4 w-4 transition-transform ${productsOpen ? "rotate-180" : ""}`} />
-                  </button>
-                  <AnimatePresence>
-                    {productsOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden pl-3 border-l-2 border-primary/20 ml-3"
-                      >
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-2 mb-1 px-3">Veg</p>
-                        {vegSubcategories.map(s => (
-                          <Link key={s.path} to={s.path} className="block px-3 py-1.5 text-sm text-foreground/80 hover:text-primary transition-colors">
-                            {s.label}
-                          </Link>
-                        ))}
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-3 mb-1 px-3">Non-Veg</p>
-                        {nonVegSubcategories.map(s => (
-                          <Link key={s.path} to={s.path} className="block px-3 py-1.5 text-sm text-foreground/80 hover:text-primary transition-colors">
-                            {s.label}
-                          </Link>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                    {link.label}
+                  </Link>
+                ))}
 
-                  {user && (
+                <button
+                  className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                  onClick={() => setProductsOpen(!productsOpen)}
+                >
+                  Browse Categories
+                  <ChevronDown className={`h-4 w-4 transition-transform ${productsOpen ? "rotate-180" : ""}`} />
+                </button>
+                {productsOpen && (
+                  <div className="pl-3 border-l-2 border-primary/20 ml-3">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-2 mb-1 px-3">Veg</p>
+                    {vegSubcategories.map(s => (
+                      <Link key={s.path} to={s.path} className="block px-3 py-1.5 text-sm text-foreground/80 hover:text-primary transition-colors">{s.label}</Link>
+                    ))}
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-3 mb-1 px-3">Non-Veg</p>
+                    {nonVegSubcategories.map(s => (
+                      <Link key={s.path} to={s.path} className="block px-3 py-1.5 text-sm text-foreground/80 hover:text-primary transition-colors">{s.label}</Link>
+                    ))}
+                  </div>
+                )}
+
+                {user && (
+                  <>
+                    <Link to="/profile" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors mt-2">
+                      <Settings className="h-4 w-4" /> My Profile
+                    </Link>
                     <button
                       onClick={() => { signOut(); setMobileOpen(false); }}
-                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/5 transition-colors mt-2"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/5 transition-colors"
                     >
                       <LogOut className="h-4 w-4" /> Sign Out
                     </button>
-                  )}
-                </div>
+                  </>
+                )}
               </div>
+            </div>
 
-              <div className="px-4 py-3 border-t border-border">
-                <Link
-                  to="/bulk-orders"
-                  className="flex items-center justify-center gap-2 w-full rounded-xl hero-gradient py-3 text-sm font-bold text-primary-foreground shadow-lg transition-all hover:scale-[1.02]"
-                >
-                  <Package className="h-4 w-4" /> Place Bulk Order
-                </Link>
-              </div>
-            </motion.nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <div className="px-4 py-3 border-t border-border">
+              <Link
+                to="/bulk-orders"
+                className="flex items-center justify-center gap-2 w-full rounded-xl hero-gradient py-3 text-sm font-bold text-primary-foreground shadow-lg"
+              >
+                <Package className="h-4 w-4" /> Place Bulk Order
+              </Link>
+            </div>
+          </nav>
+        </div>
+      )}
 
       <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
     </>
