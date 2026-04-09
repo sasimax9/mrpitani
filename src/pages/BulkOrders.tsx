@@ -46,7 +46,7 @@ import {
 } from "lucide-react";
 import { getProductPrice } from "@/data/products";
 import { useProducts } from "@/hooks/useProducts";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 interface OrderItem {
   id: string;
