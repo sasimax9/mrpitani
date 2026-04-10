@@ -50,8 +50,9 @@ const Profile = () => {
         .eq("user_id", user.id);
       if (error) throw error;
       toast.success("Profile updated successfully!");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to update profile");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to update profile";
+      toast.error(message);
     } finally {
       setSaving(false);
     }

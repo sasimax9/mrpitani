@@ -39,7 +39,9 @@ const loadCart = (): CartItem[] => {
 const saveCart = (items: CartItem[]) => {
   try {
     localStorage.setItem(CART_KEY, JSON.stringify(items));
-  } catch {}
+  } catch (error) {
+    console.error("Failed to persist cart to localStorage", error);
+  }
 };
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {

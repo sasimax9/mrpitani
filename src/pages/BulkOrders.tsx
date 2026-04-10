@@ -326,9 +326,10 @@ const BulkOrders = () => {
 
       setCreatedOrderId("");
       setShowSuccess(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Bulk order save failed:", error);
-      setSubmitError(error?.message || "Failed to submit bulk order.");
+      const message = error instanceof Error ? error.message : "Failed to submit bulk order.";
+      setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }
