@@ -52,7 +52,6 @@ interface OrderItem {
   price: number;
   discount: number;
   total: number;
-  estimatedWeightKg: number;
 }
 
 const BULK_ORDERS_TABLE = "bulk_orders";
@@ -86,14 +85,12 @@ const productCategories = [
 
 function getProductUnits(packSizes: string[]): string[] {
   const units = new Set<string>();
-
   for (const size of packSizes) {
     const s = size.toLowerCase();
     if (s.includes("kg") || s.includes("g")) units.add("Kg");
     if (s.includes("pcs")) units.add("Pack");
     if (s.includes("l") && !s.includes("kg")) units.add("Box");
   }
-
   if (units.size === 0) units.add("Pack");
   return Array.from(units);
 }
@@ -103,14 +100,6 @@ function getDiscount(qty: number) {
   if (qty >= 20) return 10;
   if (qty >= 10) return 5;
   return 0;
-}
-
-function estimateWeightKg(quantity: number, unit: string) {
-  const normalized = unit.toLowerCase();
-  if (normalized === "kg") return quantity;
-  if (normalized === "pack") return quantity;
-  if (normalized === "box") return quantity;
-  return quantity;
 }
 
 const fadeUp = {
@@ -155,21 +144,18 @@ const BulkOrders = () => {
 
   const filteredProducts = useMemo(() => {
     let list = products;
-
     if (form.category !== "all") {
       list = list.filter((p) => p.category === form.category);
     }
-
     if (search) {
       list = list.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
     }
-
     return list;
   }, [form.category, search, products]);
 
   const selectedProduct = products.find((p) => p.name === form.product);
   const availableUnits = selectedProduct ? getProductUnits(selectedProduct.packSizes) : [];
-  const hasBrandVariants = !!selectedProduct?.brandVariants && selectedProduct.brandVariants.length > 1;
+  const hasBrandVariants = selectedProduct?.brandVariants && selectedProduct.brandVariants.length > 1;
 
   const productPrice = selectedProduct ? getProductPrice(selectedProduct, form.brand || undefined) : 0;
   const discount = getDiscount(form.quantity);
@@ -178,11 +164,6 @@ const BulkOrders = () => {
   const hasEstimate = !!selectedProduct && form.quantity > 0;
 
   const orderGrandTotal = orderItems.reduce((sum, item) => sum + item.total, 0);
-  const orderSubtotal = orderItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
-  const totalDiscountAmount = orderSubtotal - orderGrandTotal;
-  const orderDiscountPercent =
-    orderSubtotal > 0 ? Number(((totalDiscountAmount / orderSubtotal) * 100).toFixed(2)) : 0;
-  const totalWeightKg = orderItems.reduce((sum, item) => sum + item.estimatedWeightKg, 0);
 
   const handleChange = (field: string, value: string | number) => {
     setForm((prev) => {
@@ -212,19 +193,15 @@ const BulkOrders = () => {
   const handleAddToList = () => {
     if (!selectedProduct) return;
 
-    const unit = form.unit || "Kg";
-    const estimatedWeightKg = estimateWeightKg(form.quantity, unit);
-
     const newItem: OrderItem = {
       id: `${selectedProduct.id}-${form.brand}-${Date.now()}`,
       productName: selectedProduct.name,
       brand: form.brand || selectedProduct.brand || "Default",
       quantity: form.quantity,
-      unit,
+      unit: form.unit || "Kg",
       price: productPrice,
       discount,
       total: finalTotal,
-      estimatedWeightKg,
     };
 
     setOrderItems((prev) => [...prev, newItem]);
@@ -237,13 +214,11 @@ const BulkOrders = () => {
       unit: "",
     }));
 
-    if (errors["orderItems"]) {
+    if (errors.orderItems) {
       setErrors((prev) => ({ ...prev, orderItems: false }));
     }
 
-    setTimeout(() => {
-      listRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }, 200);
+    setTimeout(() => listRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 200);
   };
 
   const handleRemoveItem = (id: string) => {
@@ -265,8 +240,6 @@ const BulkOrders = () => {
       `₹${item.total.toFixed(0)}`,
     ]);
 
-    rows.push(["", "", "", "", "", "", "Subtotal", `₹${orderSubtotal.toFixed(0)}`]);
-    rows.push(["", "", "", "", "", "", "Discount", `${orderDiscountPercent}%`]);
     rows.push(["", "", "", "", "", "", "Grand Total", `₹${orderGrandTotal.toFixed(0)}`]);
 
     const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
@@ -282,14 +255,14 @@ const BulkOrders = () => {
   };
 
   const validate = () => {
-    const required = ["business", "contact", "phone"];
+    const required = ["business", "contact", "phone", "email", "city"];
     const errs: Record<string, boolean> = {};
 
     required.forEach((f) => {
       if (!form[f as keyof typeof form]) errs[f] = true;
     });
 
-    if (orderItems.length === 0) errs["orderItems"] = true;
+    if (orderItems.length === 0) errs.orderItems = true;
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -313,10 +286,6 @@ const BulkOrders = () => {
     setSubmitError("");
 
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
       const itemsPayload = orderItems.map((item) => ({
         id: item.id,
         productName: item.productName,
@@ -326,7 +295,6 @@ const BulkOrders = () => {
         price: item.price,
         discount: item.discount,
         total: item.total,
-        estimatedWeightKg: item.estimatedWeightKg,
       }));
 
       const notesBlock = [
@@ -339,29 +307,24 @@ const BulkOrders = () => {
         .join("\n");
 
       const orderPayload = {
-        // user_id: user?.id ?? null,
         company_name: form.business || null,
         contact_name: form.contact,
         contact_phone: form.phone,
         contact_email: form.email || null,
         items: itemsPayload,
-        total_weight_kg: totalWeightKg,
-        discount_percent: orderDiscountPercent,
-        subtotal: orderSubtotal,
+        total_weight_kg: 0,
+        discount_percent: 0,
+        subtotal: orderGrandTotal,
         total: orderGrandTotal,
         status: "pending",
         notes: notesBlock || null,
       };
 
-      const { data, error } = await supabase
-        .from(BULK_ORDERS_TABLE)
-        .insert([orderPayload])
-        .select("id")
-        .single();
+      const { error } = await supabase.from(BULK_ORDERS_TABLE).insert([orderPayload]);
 
       if (error) throw error;
 
-      setCreatedOrderId(data?.id || "");
+      setCreatedOrderId("");
       setShowSuccess(true);
     } catch (error: any) {
       console.error("Bulk order save failed:", error);
@@ -385,33 +348,27 @@ const BulkOrders = () => {
 
   const whatsappMsg = encodeURIComponent(
     `Hi Mr.Pitani, I'd like to place a bulk order:\n` +
-      `Business: ${form.business || "-"}\n` +
+      `Business: ${form.business}\n` +
       `Contact: ${form.contact}\n` +
       `Phone: ${form.phone}\n` +
       `Email: ${form.email || "-"}\n\n` +
       `Items:\n${orderSummaryText}\n\n` +
-      `Subtotal: ₹${orderSubtotal.toFixed(0)}\n` +
-      `Discount: ${orderDiscountPercent}%\n` +
       `Grand Total: ₹${orderGrandTotal.toFixed(0)}\n` +
-      `Total Weight: ${totalWeightKg.toFixed(2)} Kg\n` +
-      `City: ${form.city || "-"}\n` +
+      `City: ${form.city}\n` +
       `Address: ${form.address || "-"}\n` +
       `Expected Delivery: ${form.date || "-"}\n` +
       `Notes: ${form.notes || "-"}`
   );
 
-  const emailSubject = encodeURIComponent(`Bulk Order – ${form.business || form.contact}`);
+  const emailSubject = encodeURIComponent(`Bulk Order – ${form.business}`);
   const emailBody = encodeURIComponent(
-    `Business: ${form.business || "-"}\n` +
+    `Business: ${form.business}\n` +
       `Contact: ${form.contact}\n` +
       `Phone: ${form.phone}\n` +
       `Email: ${form.email || "-"}\n\n` +
       `Order Items:\n${orderSummaryText}\n\n` +
-      `Subtotal: ₹${orderSubtotal.toFixed(0)}\n` +
-      `Discount: ${orderDiscountPercent}%\n` +
       `Grand Total: ₹${orderGrandTotal.toFixed(0)}\n` +
-      `Total Weight: ${totalWeightKg.toFixed(2)} Kg\n` +
-      `City: ${form.city || "-"}\n` +
+      `City: ${form.city}\n` +
       `Address: ${form.address || "-"}\n` +
       `Expected Delivery: ${form.date || "-"}\n` +
       `Notes: ${form.notes || "-"}`
@@ -436,34 +393,20 @@ const BulkOrders = () => {
         <motion.div className="container relative z-10" initial="hidden" animate="visible" variants={stagger}>
           <motion.div
             variants={fadeUp}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-4 py-1.5 text-xs font-semibold text-primary-foreground backdrop-blur-sm"
+            className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-4 py-1.5 text-xs font-semibold text-primary-foreground backdrop-blur-sm mb-6"
           >
             <Boxes className="h-3.5 w-3.5" /> B2B Supply Partner
           </motion.div>
-
-          <motion.h1
-            variants={fadeUp}
-            className="mb-4 text-4xl font-extrabold tracking-tight text-primary-foreground md:text-5xl lg:text-6xl"
-          >
+          <motion.h1 variants={fadeUp} className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-primary-foreground mb-4 tracking-tight">
             Bulk Orders / B2B
           </motion.h1>
-
-          <motion.p
-            variants={fadeUp}
-            className="mb-8 max-w-2xl text-lg leading-relaxed text-primary-foreground/80 md:text-xl"
-          >
+          <motion.p variants={fadeUp} className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mb-8 leading-relaxed">
             Partner with us for reliable large-volume supply with consistent quality and scheduled deliveries.
           </motion.p>
-
           <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
-            <a
-              href="#order-form"
-              className="group inline-flex items-center gap-2 rounded-xl bg-primary-foreground px-6 py-3 text-sm font-bold text-primary shadow-lg transition-all hover:scale-105"
-            >
-              <Package className="h-4 w-4" /> Place Bulk Order
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            <a href="#order-form" className="group inline-flex items-center gap-2 rounded-xl bg-primary-foreground px-6 py-3 text-sm font-bold text-primary shadow-lg transition-all hover:scale-105">
+              <Package className="h-4 w-4" /> Place Bulk Order <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </a>
-
             <a
               href="https://wa.me/919999999999?text=Hi%20Mr.Pitani,%20I%20want%20to%20discuss%20bulk%20supply"
               target="_blank"
@@ -476,25 +419,15 @@ const BulkOrders = () => {
         </motion.div>
       </section>
 
-      <section className="container relative z-10 -mt-10 mb-16">
-        <motion.div
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          variants={stagger}
-        >
+      <section className="container -mt-10 relative z-10 mb-16">
+        <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={stagger}>
           {trustCards.map(({ icon: Icon, title, desc }) => (
-            <motion.div
-              key={title}
-              variants={fadeUp}
-              className="group rounded-2xl p-6 glass-card glass-card-hover transition-all duration-300"
-            >
+            <motion.div key={title} variants={fadeUp} className="group rounded-2xl p-6 glass-card glass-card-hover transition-all duration-300">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl hero-gradient text-primary-foreground transition-transform group-hover:scale-110">
                 <Icon className="h-6 w-6" />
               </div>
-              <h3 className="mb-1 text-base font-bold text-foreground">{title}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{desc}</p>
+              <h3 className="text-base font-bold text-foreground mb-1">{title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -510,19 +443,9 @@ const BulkOrders = () => {
           </motion.p>
         </motion.div>
 
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={stagger}
-        >
+        <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
           {benefits.map(({ icon: Icon, text }) => (
-            <motion.div
-              key={text}
-              variants={fadeUp}
-              className="flex items-center gap-3 rounded-xl p-4 glass-card glass-card-hover transition-all"
-            >
+            <motion.div key={text} variants={fadeUp} className="flex items-center gap-3 rounded-xl p-4 glass-card glass-card-hover transition-all">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Icon className="h-4 w-4" />
               </div>
@@ -558,42 +481,20 @@ const BulkOrders = () => {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Company Name *</label>
-                  <input
-                    value={form.business}
-                    onChange={(e) => handleChange("business", e.target.value)}
-                    placeholder="e.g. Royal Kitchen"
-                    className={inputClass("business")}
-                  />
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Business Name *</label>
+                  <input value={form.business} onChange={(e) => handleChange("business", e.target.value)} placeholder="e.g. Royal Kitchen" className={inputClass("business")} />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Contact Name *</label>
-                  <input
-                    value={form.contact}
-                    onChange={(e) => handleChange("contact", e.target.value)}
-                    placeholder="Full name"
-                    className={inputClass("contact")}
-                  />
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Contact Person *</label>
+                  <input value={form.contact} onChange={(e) => handleChange("contact", e.target.value)} placeholder="Full name" className={inputClass("contact")} />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Phone *</label>
-                  <input
-                    type="tel"
-                    value={form.phone}
-                    onChange={(e) => handleChange("phone", e.target.value)}
-                    placeholder="+91 98765 43210"
-                    className={inputClass("phone")}
-                  />
+                  <input type="tel" value={form.phone} onChange={(e) => handleChange("phone", e.target.value)} placeholder="+91 98765 43210" className={inputClass("phone")} />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Email</label>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
-                    placeholder="you@business.com"
-                    className={inputClass("email")}
-                  />
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Email *</label>
+                  <input type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder="you@business.com" className={inputClass("email")} />
                 </div>
               </div>
             </motion.div>
@@ -604,22 +505,12 @@ const BulkOrders = () => {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5">City / Area</label>
-                  <input
-                    value={form.city}
-                    onChange={(e) => handleChange("city", e.target.value)}
-                    placeholder="e.g. Hyderabad"
-                    className={inputClass("city")}
-                  />
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1.5">City / Area *</label>
+                  <input value={form.city} onChange={(e) => handleChange("city", e.target.value)} placeholder="e.g. Hyderabad" className={inputClass("city")} />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Expected Delivery Date</label>
-                  <input
-                    type="date"
-                    value={form.date}
-                    onChange={(e) => handleChange("date", e.target.value)}
-                    className={inputClass("date")}
-                  />
+                  <input type="date" value={form.date} onChange={(e) => handleChange("date", e.target.value)} className={inputClass("date")} />
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-xs font-semibold text-muted-foreground mb-1.5">Delivery Address</label>
@@ -892,8 +783,8 @@ const BulkOrders = () => {
                     </div>
 
                     <div className="rounded-xl border border-border overflow-hidden">
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
+                      <div className="overflow-x-auto [-webkit-overflow-scrolling:touch]">
+                        <table className="min-w-[720px] w-full text-sm">
                           <thead>
                             <tr className="bg-muted/60">
                               <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground uppercase tracking-wider">#</th>
@@ -932,7 +823,7 @@ const BulkOrders = () => {
                                     <span className="text-muted-foreground">—</span>
                                   )}
                                 </td>
-                                <td className="px-4 py-3 text-right font-bold text-foreground">₹{item.total.toFixed(0)}</td>
+                                <td className="px-4 py-3 text-right font-bold text-foreground whitespace-nowrap">₹{item.total.toFixed(0)}</td>
                                 <td className="px-3 py-3">
                                   <button
                                     type="button"
@@ -946,24 +837,13 @@ const BulkOrders = () => {
                             ))}
                           </tbody>
                           <tfoot>
-                            <tr className="border-t bg-muted/30">
-                              <td colSpan={6} className="px-4 py-2 text-right font-semibold text-foreground">Subtotal</td>
-                              <td className="px-4 py-2 text-right font-bold text-foreground">₹{orderSubtotal.toFixed(0)}</td>
-                              <td></td>
-                            </tr>
-                            <tr className="border-t bg-muted/20">
-                              <td colSpan={6} className="px-4 py-2 text-right font-semibold text-foreground">Discount</td>
-                              <td className="px-4 py-2 text-right font-bold text-secondary">{orderDiscountPercent}%</td>
-                              <td></td>
-                            </tr>
-                            <tr className="border-t bg-muted/20">
-                              <td colSpan={6} className="px-4 py-2 text-right font-semibold text-foreground">Total Weight</td>
-                              <td className="px-4 py-2 text-right font-bold text-foreground">{totalWeightKg.toFixed(2)} Kg</td>
-                              <td></td>
-                            </tr>
                             <tr className="border-t-2 border-primary/20 bg-primary/5">
-                              <td colSpan={6} className="px-4 py-3 text-right font-bold text-foreground">Grand Total</td>
-                              <td className="px-4 py-3 text-right text-lg font-extrabold text-primary">₹{orderGrandTotal.toFixed(0)}</td>
+                              <td colSpan={6} className="px-3 sm:px-4 py-3 text-right text-sm sm:text-base font-bold text-foreground">
+                                Grand Total
+                              </td>
+                              <td className="px-3 sm:px-4 py-3 text-right text-base sm:text-lg font-extrabold text-primary whitespace-nowrap">
+                                ₹{orderGrandTotal.toFixed(0)}
+                              </td>
                               <td></td>
                             </tr>
                           </tfoot>
@@ -971,7 +851,7 @@ const BulkOrders = () => {
                       </div>
                     </div>
 
-                    {errors["orderItems"] && (
+                    {errors.orderItems && (
                       <p className="text-xs text-destructive mt-2 flex items-center gap-1">
                         <Info className="h-3 w-3" /> Please add at least one product to your order list.
                       </p>
@@ -985,9 +865,7 @@ const BulkOrders = () => {
                   <ListPlus className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                   <p className="text-sm font-medium text-muted-foreground">Your order list is empty</p>
                   <p className="text-xs text-muted-foreground mt-1">Select products above and click "Add to List"</p>
-                  {errors["orderItems"] && (
-                    <p className="text-xs text-destructive mt-2 font-medium">Please add at least one product</p>
-                  )}
+                  {errors.orderItems && <p className="text-xs text-destructive mt-2 font-medium">Please add at least one product</p>}
                 </motion.div>
               )}
             </div>
@@ -1015,7 +893,7 @@ const BulkOrders = () => {
               <button
                 type="submit"
                 disabled={orderItems.length === 0 || isSubmitting}
-                className="w-full rounded-xl hero-gradient py-4 text-base font-bold text-primary-foreground shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] disabled:opacity-40 flex items-center justify-center gap-2"
+                className="w-full rounded-xl hero-gradient py-4 text-sm sm:text-base font-bold text-primary-foreground shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] disabled:opacity-40 flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -1048,7 +926,7 @@ const BulkOrders = () => {
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-md rounded-2xl p-8 shadow-2xl glass-card"
+              className="relative w-full max-w-md rounded-2xl p-6 sm:p-8 shadow-2xl glass-card"
             >
               <button
                 onClick={handleCloseSuccess}
@@ -1079,9 +957,9 @@ const BulkOrders = () => {
                     <span className="font-semibold text-foreground whitespace-nowrap">₹{item.total.toFixed(0)}</span>
                   </div>
                 ))}
-                <div className="border-t border-border pt-2 flex justify-between">
+                <div className="border-t border-border pt-2 flex justify-between gap-3">
                   <span className="font-bold text-foreground">Grand Total</span>
-                  <span className="font-extrabold text-primary">₹{orderGrandTotal.toFixed(0)}</span>
+                  <span className="font-extrabold text-primary whitespace-nowrap">₹{orderGrandTotal.toFixed(0)}</span>
                 </div>
               </div>
 
@@ -1098,7 +976,7 @@ const BulkOrders = () => {
                   href={`https://wa.me/919999999999?text=${whatsappMsg}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[hsl(var(--whatsapp))] py-3 text-sm font-bold text-primary-foreground transition-all hover:scale-[1.02]"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-sm font-bold text-foreground transition-all hover:bg-muted hover:scale-[1.02]"
                 >
                   <MessageCircle className="h-4 w-4" /> Send to WhatsApp
                 </a>
