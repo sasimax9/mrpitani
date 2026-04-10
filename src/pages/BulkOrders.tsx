@@ -408,7 +408,7 @@ const BulkOrders = () => {
               <Package className="h-4 w-4" /> Place Bulk Order <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </a>
             <a
-              href="https://wa.me/919999999999?text=Hi%20Mr.Pitani,%20I%20want%20to%20discuss%20bulk%20supply"
+              href="https://wa.me/918977775878?text=Hi%20Mr.Pitani,%20I%20want%20to%20discuss%20bulk%20supply"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-xl border-2 border-primary-foreground/30 bg-primary-foreground/10 px-6 py-3 text-sm font-bold text-primary-foreground backdrop-blur-sm transition-all hover:bg-primary-foreground/20 hover:scale-105"
@@ -973,7 +973,7 @@ const BulkOrders = () => {
                 </button>
 
                 <a
-                  href={`https://wa.me/919999999999?text=${whatsappMsg}`}
+                  href={`https://wa.me/918977775878?text=${whatsappMsg}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-3 text-sm font-bold text-foreground transition-all hover:bg-muted hover:scale-[1.02]"

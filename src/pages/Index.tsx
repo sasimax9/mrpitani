@@ -8,7 +8,7 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 const heroSlides = [
   { tag: "🔥 Limited Time Offer", title: "Flat 15% Off on Bulk Orders 30kg+", desc: "Stock up your kitchen with premium frozen foods. Free delivery on orders above ₹5,000.", cta: { label: "Shop Now", path: "/products" }, cta2: { label: "Bulk Enquiry", path: "/bulk-orders" } },
-  { tag: "🧊 New Arrivals", title: "Fresh Seafood Collection", desc: "Prawns, Vanjaram, Pomfret & more – sourced daily and delivered frozen to your door.", cta: { label: "View Seafood", path: "/products/non-veg" }, cta2: { label: "WhatsApp Order", path: "https://wa.me/919999999999" } },
+  { tag: "🧊 New Arrivals", title: "Fresh Seafood Collection", desc: "Prawns, Vanjaram, Pomfret & more – sourced daily and delivered frozen to your door.", cta: { label: "View Seafood", path: "/products/non-veg" }, cta2: { label: "WhatsApp Order", path: "https://wa.me/918977775878" } },
   { tag: "🥟 Snack Season", title: "Party Snacks Starting ₹90", desc: "Samosas, nuggets, rolls, momos – everything you need for the perfect party spread.", cta: { label: "Explore Snacks", path: "/products/veg?cat=veg-snacks" }, cta2: { label: "View All", path: "/products" } },
   { tag: "🏪 For Businesses", title: "B2B Supply for Hotels & Restaurants", desc: "Scheduled deliveries, cold chain logistics, and competitive bulk pricing for your business.", cta: { label: "Partner With Us", path: "/bulk-orders" }, cta2: { label: "Our Brands", path: "/brands" } },
 ];

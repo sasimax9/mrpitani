@@ -39,7 +39,7 @@ const Contact = () => {
               <h2 className="text-xl font-bold text-foreground mb-4">Contact Information</h2>
               <div className="space-y-4">
                 {[
-                  { icon: Phone, label: "Phone", value: "+91 99999 99999" },
+                  { icon: Phone, label: "Phone", value: "+91 89777 75878" },
                   { icon: Mail, label: "Email", value: "orders@mrpitani.com" },
                   { icon: MapPin, label: "Address", value: "Cold Storage Complex, Industrial Area, City, State, India" },
                   { icon: Clock, label: "Business Hours", value: "Mon – Sat: 7:00 AM – 9:00 PM | Sun: 8:00 AM – 2:00 PM" },
@@ -58,7 +58,7 @@ const Contact = () => {
             </div>
 
             <a
-              href="https://wa.me/919999999999?text=Hi%20Mr.Pitani,%20I%20want%20to%20enquire%20about%20your%20products"
+              href="https://wa.me/918977775878?text=Hi%20Mr.Pitani,%20I%20want%20to%20enquire%20about%20your%20products"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-6 py-3 font-semibold text-primary-foreground transition-transform hover:scale-105"

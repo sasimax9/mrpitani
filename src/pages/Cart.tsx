@@ -145,7 +145,7 @@ const Cart = () => {
       ${discountPct > 0 ? `<div class="summary-row" style="color:#059669"><span>Bulk Discount (${discountPct}%)</span><span>-₹${discountAmt.toFixed(0)}</span></div>` : ""}
       <div class="summary-row total-row"><span>Grand Total</span><span>₹${finalPrice.toFixed(0)}</span></div>
     </div>
-    <div class="footer"><p>Thank you for choosing Mr.Pitani!</p><p>Contact: WhatsApp +91-9999999999</p></div>
+    <div class="footer"><p>Thank you for choosing Mr.Pitani!</p><p>Contact: WhatsApp +91-8977775878</p></div>
     </body></html>`);
     printWindow.document.close();
     printWindow.print();
@@ -338,7 +338,7 @@ const Cart = () => {
 
               <div className="mt-5 space-y-2.5">
                 <a
-                  href={`https://wa.me/919999999999?text=${encodeURIComponent(orderText)}`}
+                  href={`https://wa.me/918977775878?text=${encodeURIComponent(orderText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-[hsl(var(--whatsapp))] py-3 text-xs sm:text-sm font-bold text-primary-foreground transition-colors hover:brightness-110"
