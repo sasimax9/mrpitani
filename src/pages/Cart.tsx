@@ -203,8 +203,9 @@ const Cart = () => {
         setCodDialogOpen(false);
         setCodForm({ name: "", phone: "", address: "" });
       }, 3000);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to place order");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to place order";
+      toast.error(message);
     } finally {
       setCodLoading(false);
     }
@@ -253,8 +254,9 @@ const Cart = () => {
         setPickupDialogOpen(false);
         setPickupForm({ name: "", phone: "" });
       }, 3000);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to place order");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to place order";
+      toast.error(message);
     } finally {
       setPickupLoading(false);
     }
